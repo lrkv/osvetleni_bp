@@ -1,0 +1,194 @@
+kolejiste:
+  zidenice:
+    nazev: "Židenice"
+    poznamka: ""
+    prvky:
+      osvetleniKoleji:
+        adresa: 10
+        port: 0
+        nazev: "Osvětlení kolejiště"
+        popis: "Venkovní lampy a nástupiště"
+        algoritmus: "koleje"
+        poznamka: ""
+      vypravni_budova:
+        nazev: "Výpravní budova Židenice"
+        poznamka: ""
+        cekarna:
+          adresa: 10
+          port: 1
+          nazev: "Čekárna"
+          popis: "Hlavní prostor pro cestující"
+          algoritmus: "cekarna"
+          poznamka: ""
+        wc:
+          adresa: 10
+          port: 2
+          nazev: "Toalety"
+          popis: "Sociální zařízení pro veřejnost"
+          algoritmus: "wc"
+          poznamka: ""
+        kancelar:
+          adresa: 10
+          port: 3
+          nazev: "Dopravní kancelář"
+          popis: "Pracoviště výpravčího"
+          algoritmus: "kancelar"
+          poznamka: ""
+      sklad_naradi:
+        nazev: "Sklad nářadí"
+        poznamka: ""
+        technicke:
+          adresa: 10
+          port: 4
+          nazev: "Osvětlení skladu"
+          popis: "Technické prostory údržby"
+          algoritmus: "technicke"
+          poznamka: ""
+
+  ceska:
+    nazev: "Česká"
+    poznamka: ""
+    prvky:
+      osvetleniKoleji:
+        adresa: 30
+        port: 0
+        nazev: "Osvětlení kolejiště"
+        popis: "Venkovní prostor zastávky"
+        algoritmus: "koleje"
+        poznamka: ""
+      vypravni_budova:
+        nazev: "Zastávka Česká"
+        poznamka: ""
+        cekarna:
+          adresa: 30
+          port: 1
+          nazev: "Čekárna"
+          popis: "Prostor pro cestující"
+          algoritmus: "cekarna"
+          poznamka: ""
+        wc:
+          adresa: 30
+          port: 2
+          nazev: "WC"
+          popis: "Toalety"
+          algoritmus: "wc"
+          poznamka: ""
+
+  kurim:
+    nazev: "Kuřim"
+    poznamka: ""
+    prvky:
+      osvetleniKoleji:
+        adresa: 20
+        port: 0
+        nazev: "Osvětlení kolejiště"
+        popis: "Návěstní a venkovní světla"
+        algoritmus: "koleje"
+        poznamka: ""
+      vypravni_budova:
+        nazev: "Výpravní budova Kuřim"
+        poznamka: ""
+        cekarna:
+          adresa: 20
+          port: 1
+          nazev: "Čekárna"
+          popis: "Hala pro cestující"
+          algoritmus: "cekarna"
+          poznamka: ""
+        wc:
+          adresa: 20
+          port: 2
+          nazev: "Sociální zařízení"
+          popis: "Toalety"
+          algoritmus: "wc"
+          poznamka: ""
+        kancelar:
+          adresa: 20
+          port: 3
+          nazev: "Kancelář"
+          popis: "Kancelář výpravčího"
+          algoritmus: "kancelar"
+          poznamka: ""
+      trafostanice:
+        nazev: "Technický objekt"
+        poznamka: ""
+        technicke:
+          adresa: 20
+          port: 4
+          nazev: "Technické osvětlení"
+          popis: "Vnitřní osvětlení technologie"
+          algoritmus: "technicke"
+          poznamka: ""
+
+  tisnov:
+    nazev: "Tišnov"
+    poznamka: ""
+    prvky:
+      osvetleniKoleji:
+        adresa: 40
+        port: 0
+        nazev: "Osvětlení kolejiště"
+        popis: "Venkovní osvětlení dle SŽDC E11"
+        algoritmus: "koleje"
+        poznamka: ""
+      vypravni_budova:
+        nazev: "Výpravní budova Tišnov"
+        poznamka: ""
+        cekarna:
+          adresa: 40
+          port: 1
+          nazev: "Čekárna"
+          popis: "Hala"
+          algoritmus: "cekarna"
+          poznamka: ""
+        wc:
+          adresa: 40
+          port: 2
+          nazev: "Toalety"
+          popis: "Pánské a dámské WC"
+          algoritmus: "wc"
+          poznamka: ""
+        kancelar:
+          adresa: 40
+          port: 3
+          nazev: "Kancelář"
+          popis: "Služební místnost"
+          algoritmus: "kancelar"
+          poznamka: ""
+      technicky_domek:
+        nazev: "Technický domek"
+        poznamka: ""
+        technicke:
+          adresa: 40
+          port: 4
+          nazev: "Technické zázemí"
+          popis: "Osvětlení dílny"
+          algoritmus: "technicke"
+          poznamka: ""
+      ohrev_vyhybek:
+        nazev: "Budova ohřevu"
+        poznamka: ""
+        technicke:
+          adresa: 40
+          port: 5
+          nazev: "Ohřev výhybek"
+          popis: "Technologické osvětlení"
+          algoritmus: "technicke"
+          poznamka: ""
+      obchod:
+        nazev: "Prodejna občerstvení"
+        poznamka: ""
+        prodejna:
+          adresa: 40
+          port: 5
+          nazev: "Osvětlení prodejny"
+          popis: ""
+          algoritmus: "cekarna"
+          poznamka: ""
+        vyloha:
+          adresa: 40
+          port: 5
+          nazev: "Vyloha"
+          popis: ""
+          algoritmus: "wc"
+          poznamka: ""

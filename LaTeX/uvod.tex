@@ -1,0 +1,78 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- BALÍČKY ---
+\usepackage[utf8]{inputenc}     % Kódování
+\usepackage[czech]{babel}       % Čeština
+\usepackage[T1]{fontenc}        % Fonty (podpora diakritiky)
+\usepackage{geometry}           % Okraje
+\geometry{margin=2.5cm}
+\usepackage{titlesec}           % Formátování nadpisů
+\usepackage{lipsum}             % Pro generování "vaty" (výplňového textu)
+
+% --- INFORMACE O DOKUMENTU ---
+\title{Systém automatizovaného řízení osvětlení dle SŽDC E11}
+\author{Projektový Tým: Kolejiště 2026}
+\date{\today}
+
+\begin{document}
+
+% --- 1. STRANA: TITULNÍ ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\huge\bfseries Technická dokumentace systému\par}
+    \vspace{1.5cm}
+    {\Large Implementace osvětlovacího kalendáře SŽDC\par}
+    \vspace{2cm}
+    \textbf{Abstrakt:}\\
+    Tento nový dokument popisuje softwarovou architekturu pro automatizaci osvětlovacích soustav v železničních stanicích Židenice, Kuřim a Tišnov s ohledem na energetickou efektivitu a předpisy SŽDC.
+    \vfill
+    {\large \today \par}
+\end{titlepage}
+
+% --- 2. STRANA: OBSAH A ÚVOD ---
+\newpage
+\tableofcontents
+\thispagestyle{plain}
+
+\section{Úvod a cíle projektu}
+Projekt byl zahájen s cílem nahradit manuální nastavování spínacích hodin v uzlových stanicích. Systém využívá digitální podobu osvětlovacího kalendáře (formát JSON) a dynamicky počítá časy zapnutí a vypnutí pro konkrétní týdny v roce.
+
+Hlavní důraz je kladen na:
+\begin{itemize}
+    \item Přesnost dle středoevropského času (SEČ).
+    \item Automatickou detekci letního času (DST).
+    \item Hierarchickou správu objektů (Stanice -> Budovy -> Okruhy).
+\end{itemize}
+
+\lipsum[1-2] % Generuje náhodný text pro zaplnění strany
+
+% --- 3. STRANA: TECHNICKÁ ARCHITEKTURA ---
+\newpage
+\section{Technická architektura}
+Systém je postaven na jazyce Python a konfiguračních souborech YAML. Každý prvek v systému má přidělené unikátní ID, což umožňuje adresné ovládání jednotlivých portů řídicí jednotky.
+
+\subsection{Struktura datového modelu}
+Data jsou rozdělena na statickou infrastrukturu a dynamické osvětlovací tabulky. Všechny třídy v modulu \texttt{modely.py} dědí ze základní třídy \texttt{Prvek}.
+
+\subsection{Implementace algoritmů}
+Algoritmy pro jednotlivé okruhy (např. \texttt{cekarna}, \texttt{wc}, \texttt{koleje}) umožňují odlišné chování pro různé typy prostor. Zatímco osvětlení kolejiště se řídí striktně kalendářem, prostory pro cestující mohou využívat PIR senzory.
+
+\lipsum[3-4]
+
+% --- 4. STRANA: REALIZACE A ZÁVĚR ---
+\newpage
+\section{Realizace ve stanicích}
+V rámci pilotního provozu byly do systému integrovány následující železniční uzly:
+\begin{enumerate}
+    \item \textbf{Židenice:} Hlavní zaměření na nástupiště.
+    \item \textbf{Kuřim:} Implementace včetně technických objektů.
+    \item \textbf{Tišnov:} Nejrozsáhlejší konfigurace s ohřevem výhybek.
+\end{enumerate}
+
+\section{Závěrečné shrnutí}
+Dosažené úspory elektrické energie se odhadují na 15 \% oproti fixně nastaveným časovým spínačům. Systém prokázal vysokou stabilitu i při přechodech mezi časovými pásmy.
+
+\lipsum[5-6]
+
+\end{document}

@@ -1,0 +1,143 @@
+kolejiste:
+  nazev: "Zkušební data"
+  verze: "0.0.1"
+  datum: "2026-04-11"
+  poznamka: "Hlavní modulovka, DCC řízení"
+
+  nadrazi:
+    # stanice Praha
+    - nazev: "Praha hlavní nádraží"
+      poznamka: "Největší stanice na panelu"
+      budovy:
+        - nazev: "Historická budova"
+          poznamka: "Kavárna a staré pokladny"
+          svetelne_okruhy:
+            - nazev: "Lustr v hale"
+              adresa: "1:1"
+              poznamka: "Teplá bílá"
+              algoritmus: "zapnout_vecer"
+            - nazev: "Osvětlení perónu 1"
+              adresa: "1:2"
+              poznamka: "Zářivky"
+              algoritmus: "blikani_pri_startu"
+
+        - nazev: "Nový podzemní terminál"
+          poznamka: "Moderní část"
+          podskupiny:
+            - nazev: "Přízemí - obchody"
+              svetelne_okruhy:
+                - nazev: "Výloha pekárny"
+                  adresa: "1:3"
+                  poznamka: "Studená bílá"
+                  algoritmus: "stale_sviti"
+                - nazev: "KFC"
+                  adresa: "1:4"
+                  poznamka: ""
+                  algoritmus: "stale_sviti"
+            - nazev: "Podchod k vlakům"
+              svetelne_okruhy:
+                - nazev: "Nouzové osvětlení"
+                  adresa: "1:4"
+                  poznamka: "Červené LED"
+                  algoritmus: "jen_pri_poruse"
+            - nazev: "Mekáč"
+              podskupiny:
+                - nazev: "hranolky"
+                  adresa: "11:1"
+                  poznamka: ""
+                  algoritmus: "stale_sviti"
+
+    # stanice Žizkov
+    - nazev: "Nákladové nádraží Žižkov"
+      poznamka: "Jen koleje a osvětlovací věže"
+      svetelne_okruhy:
+        - nazev: "Osvětlovací věž Sever"
+          adresa: "2:1"
+          poznamka: "Sodíková výbojka"
+          algoritmus: "zhasina_pomalu"
+        - nazev: "Osvětlovací věž Západ"
+          adresa: "2:2"
+          poznamka: ""
+          algoritmus: "stale_sviti"
+        - nazev: "Osvětlovací věž Jih"
+          adresa: "2:2"
+          poznamka: "Sodíková výbojka"
+          algoritmus: "zhasina_pomalu"
+        - nazev: "Návěstidlo posunu"
+          adresa: "2:3"
+          poznamka: "Modré světlo"
+          algoritmus: "sviti_pri_posunu"
+
+    # --- STANICE 3: Střední nádraží (více budov, jen přímé okruhy) ---
+    - nazev: "Ostrava-Svinov"
+      poznamka: "Spojení staré a nové architektury"
+      budovy:
+        - nazev: "Skleněná přístavba"
+          poznamka: "Moderní hala"
+          svetelne_okruhy:
+            - nazev: "Pásy LED na stropě"
+              adresa: "3:1"
+              poznamka: "RGB pásek - nastaven na bílou"
+              algoritmus: "plynule_rozsvecovani"
+        - nazev: "Stará výpravna"
+          poznamka: "Původní cihlová část"
+          svetelne_okruhy:
+            - nazev: "Kancelář výpravčího"
+              adresa: "3:2"
+              poznamka: "Jedna žárovka v okně"
+              algoritmus: "nahodne_zapina_v_noci"
+        - nazev: "Skladiště"
+          poznamka: "Dřevěná budova"
+          svetelne_okruhy:
+            - nazev: "Lampa nad vraty"
+              adresa: "3:3"
+              poznamka: "Žluté světlo"
+              algoritmus: "reaguje_na_vlak"
+
+    # --- STANICE 4: Minimalistická zastávka (jen jeden okruh) ---
+    - nazev: "Zastávka Horní Lhota"
+      poznamka: "Zapadlá vesnička, jedna kolej"
+      svetelne_okruhy:
+        - nazev: "Dřevěná lampa"
+          adresa: "4:1"
+          poznamka: "Stará lampa na dřevěném sloupu"
+          algoritmus: "blika_jako_rozbita"
+
+    # --- STANICE 5: Průmyslový areál (budovy výhradně s podskupinami) ---
+    - nazev: "Plzeň vlečka pivovar"
+      poznamka: "Rozsáhlý areál s mnoha provozy"
+      budovy:
+        - nazev: "Stáčírna a varna"
+          poznamka: "Hlavní výrobní blok"
+          podskupiny:
+            - nazev: "Varna - měděné kádě"
+              svetelne_okruhy:
+                - nazev: "Osvětlení kádí"
+                  adresa: "5:1"
+                  poznamka: "Bodovky"
+                  algoritmus: "stale_sviti"
+            - nazev: "Stáčecí linka"
+              svetelne_okruhy:
+                - nazev: "Zářivky nad linkou"
+                  adresa: "5:2"
+                  poznamka: "Velmi jasné"
+                  algoritmus: "sviti_v_pracovni_dobe"
+                - nazev: "Majáček poruchy"
+                  adresa: "5:3"
+                  poznamka: "Oranžový maják"
+                  algoritmus: "blika_pri_zastaveni_linky"
+        - nazev: "Vrátnice"
+          poznamka: "Malá budova u vjezdu"
+          podskupiny:
+            - nazev: "Místnost strážného"
+              svetelne_okruhy:
+                - nazev: "Zářivka"
+                  adresa: "5:4"
+                  poznamka: "Malý výkon"
+                  algoritmus: "sviti_24_7"
+            - nazev: "Závora"
+              svetelne_okruhy:
+                - nazev: "Červené světlo na závoře"
+                  adresa: "5:5"
+                  poznamka: "Výstraha"
+                  algoritmus: "blika_pri_spousteni"

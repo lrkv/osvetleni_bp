@@ -187,8 +187,13 @@ kolejiste:
           poznamka: ""
         vyloha:
           adresa: 40
-          port: 5
+          port: 6
           nazev: "Vyloha"
           popis: ""
           algoritmus: "wc"
           poznamka: ""
+        balkon:
+          adresa: 40
+          port: 7
+          nazev: "balkon"
+          algoritmus: "wc"

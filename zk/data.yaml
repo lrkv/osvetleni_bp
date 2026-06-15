@@ -1,0 +1,138 @@
+nazev: "Nové kolejiště - 16 okruhů"
+typ: "kolejiste"
+verze: "1.0.1"
+datum: "2026-04-11"
+
+skupiny:
+  # =========================================================
+  # STANICE 1: Praha (Celkem 6 okruhů, adresy 1:0 až 1:5)
+  # =========================================================
+  - nazev: "Praha hlavní nádraží"
+    typ: "nadrazi"
+    skupiny:
+      - nazev: "Výpravní budova"
+        typ: "budova"
+        okruhy:
+          - nazev: "Hlavní hala"
+            adresa: "1:0"
+            algoritmus: "stale_sviti"
+          - nazev: "Pokladny"
+            adresa: "1:1"
+            algoritmus: "sviti_ve_dne"
+          - nazev: "Nástupiště 1"
+            adresa: "1:2"
+            algoritmus: "blika_pri_startu"
+
+      - nazev: "Skladiště"
+        typ: "budova"
+        okruhy:
+          - nazev: "Kancelář skladníka"
+            adresa: "1:3"
+            algoritmus: "nahodne_zapina_v_noci"
+          - nazev: "Nákladová rampa"
+            adresa: "1:4"
+            algoritmus: "stale_sviti"
+          - nazev: "Venkovní reflektor"
+            adresa: "1:5"
+            algoritmus: "reaguje_na_vlak"
+    okruhy:
+      - nazev: "reflektor"
+        adresa: "2:0"
+        algoritmus: "stale_sviti"
+      - nazev: "LED"
+        adresa: "2:1"
+        algoritmus: "stale_sviti"
+
+# Kolín
+
+  - nazev: "Depo Kolín"
+    typ: "nadrazi"
+    okruhy:
+    - nazev: "LED 0"
+      adresa: "2:2"
+    - nazev: "LED 1"
+      adresa: "2:3"
+
+    skupiny:
+      - nazev: "Informace"
+        typ: "budova"
+        skupiny:
+          - nazev: "A"
+            typ: "podskupina"
+            okruhy:
+              - nazev: "červené"
+              - nazev: "zelené"
+            skupiny:
+              - nazev: "a"
+                typ: "podskupina"
+                okruhy:
+                  - nazev: "a1"
+                  - nazev: "a2"
+          - nazev: "B"
+            typ: "podskupina"
+            okruhy:
+              - nazev: "modrá"
+              - nazev: "žlutá"
+      - nazev: "Dopravní budova"
+        typ: "budova"
+        okruhy:
+          - nazev: "čekárna"
+            adresa: "2:4"
+          - nazev: "WC"
+            adresa: "2:5"
+
+  # =========================================================
+  # STANICE 2: Brno (Celkem 5 okruhů, adresy 1:6 až 1:10)
+  # =========================================================
+  - nazev: "Brno hlavní nádraží"
+    typ: "nadrazi"
+    skupiny:
+      - nazev: "Stavědlo"
+        typ: "budova"
+        okruhy:
+          - nazev: "Osvětlení řídícího pultu"
+            adresa: "1:6"
+            algoritmus: "stale_sviti"
+          - nazev: "Chodba"
+            adresa: "1:7"
+            algoritmus: "zapnout_vecer"
+
+    # Světla přímo na nádraží (mimo budovy)
+    okruhy:
+      - nazev: "Lampa severní zhlaví"
+        adresa: "1:8"
+        algoritmus: "zhasina_pomalu"
+      - nazev: "Lampa jižní zhlaví"
+        adresa: "1:9"
+        algoritmus: "zhasina_pomalu"
+      - nazev: "Podchod k vlakům"
+        adresa: "1:10"
+        algoritmus: "stale_sviti"
+
+  # =========================================================
+  # STANICE 3: Depo (Celkem 5 okruhů, adresy 1:11 až 1:15)
+  # =========================================================
+  - nazev: "Depo Olomouc"
+    typ: "nadrazi"
+    skupiny:
+      - nazev: "Rotunda"
+        typ: "budova"
+        okruhy:
+          - nazev: "Stání lokomotiv 1"
+            adresa: "1:11"
+            algoritmus: "sviti_v_pracovni_dobe"
+          - nazev: "Stání lokomotiv 2"
+            adresa: "1:12"
+            algoritmus: "sviti_v_pracovni_dobe"
+          - nazev: "Montážní jáma"
+            adresa: "1:13"
+            algoritmus: "stale_sviti"
+
+    # Světla venku v depu
+    okruhy:
+      - nazev: "Zbrojení naftou"
+        adresa: "1:14"
+        algoritmus: "zapnout_vecer"
+      - nazev: "Osvětlení točny"
+        adresa: "1:15"
+        algoritmus: "reaguje_na_vlak"

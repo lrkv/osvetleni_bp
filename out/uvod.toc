@@ -1,7 +1,0 @@
-\babel@toc {czech}{}\relax 
-\contentsline {section}{\numberline {1}Úvod a cíle projektu}{1}{}%
-\contentsline {section}{\numberline {2}Technická architektura}{2}{}%
-\contentsline {subsection}{\numberline {2.1}Struktura datového modelu}{2}{}%
-\contentsline {subsection}{\numberline {2.2}Implementace algoritmů}{2}{}%
-\contentsline {section}{\numberline {3}Realizace ve stanicích}{3}{}%
-\contentsline {section}{\numberline {4}Závěrečné shrnutí}{3}{}%

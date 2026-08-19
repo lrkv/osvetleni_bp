@@ -12,11 +12,9 @@ manager = ConfigManager()
 
 def ovladani_konzole():
     while True:
-        prikaz = input()
-        if prikaz.strip().lower() == 'p':
-            print("\n=== Aktuální struktura kolejiště ===")
-
-            # Konzole používá naši hlavní instanci manager z tohoto souboru
+        command = input()
+        if command.strip().lower() == 'p':
+            print("\n=== Current track structure ===")
             manager.print_structure()
             print("====================================\n")
 
@@ -29,7 +27,7 @@ def udrzuj_demona(daemon):
 
 def main() -> None:
     global daemon
-    tree, flat_list = manager.load_yaml('configurate/railway00.yaml')
+    tree, flat_list = manager.load_yaml('configurate/lrkv_tt.yaml')
 
     # Předání sdílených dat webové aplikaci
     app.state.manager = manager

@@ -4,7 +4,8 @@ version: "0.0"
 note: "Aktuální konfigurace na Mendelu"
 
 groups:
-  # Čejč (není nyní)
+  # Čejč (25, 26, 27, 28, 29, 30) - neexistuje zatím
+  - name: "Čejč"
   # Klobouky (1, 2, 3, 4)
   - name: "Klobouky"
     note: ""

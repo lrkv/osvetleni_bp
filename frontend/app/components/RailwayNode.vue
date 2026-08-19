@@ -1,16 +1,13 @@
 <template>
   <div class="ml-4 mt-3 border-l-2 border-slate-200 pl-4">
 
-    <!-- Vykreslení nadřazené skupiny -->
-    <div v-if="node.polozky">
+    <div v-if="node.items">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-2">
 
-        <!-- Klikatelná hlavička pro sbalení/rozbalení -->
         <div
           @click="isOpen = !isOpen"
           class="flex-1 cursor-pointer group flex items-center gap-3"
         >
-          <!-- Šipka, která se otáčí podle stavu isOpen -->
           <svg
             :class="{'rotate-90': isOpen}"
             class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-transform duration-200"
@@ -20,12 +17,11 @@
           </svg>
 
           <div>
-            <h3 class="text-lg font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ node.nazev }}</h3>
-            <p v-if="node.poznamka" class="text-sm text-slate-500 italic">{{ node.poznamka }}</p>
+            <h3 class="text-lg font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ node.name }}</h3>
+            <p v-if="node.note" class="text-sm text-slate-500 italic">{{ node.note }}</p>
           </div>
         </div>
 
-        <!-- Hromadná změna (volá funkci updateGroup) -->
         <select
           @change="updateGroup($event)"
           class="w-56 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors shadow-sm"
@@ -35,29 +31,26 @@
         </select>
       </div>
 
-      <!-- Samotný obsah skupiny, zobrazený jen když je rozbaleno (v-show) -->
       <div v-show="isOpen" class="mt-4">
         <RailwayNode
-          v-for="(child, index) in node.polozky"
+          v-for="(child, index) in node.items"
           :key="child.id || index"
           :node="child"
         />
       </div>
     </div>
 
-    <!-- Vykreslení konkrétního koncového světla -->
     <div v-else class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 transition-all hover:shadow-md hover:border-indigo-100">
       <div>
-        <h4 class="font-medium text-slate-900">{{ node.nazev }}</h4>
+        <h4 class="font-medium text-slate-900">{{ node.name }}</h4>
         <div class="text-xs text-slate-500 mt-1.5 flex gap-3">
-          <span>Adresa: <strong class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">{{ node.adresa }}</strong></span>
+          <span>Adresa: <strong class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">{{ node.address }}</strong></span>
           <span>ID: {{ node.id }}</span>
         </div>
       </div>
 
-      <!-- Stejný styl selectu jako u skupiny -->
       <select
-        :value="node.algoritmus"
+        :value="node.algorithm"
         @change="updateSingle($event)"
         class="w-56 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors shadow-sm"
       >
@@ -78,7 +71,6 @@ const props = defineProps({
   }
 })
 
-// Nový stav pro rozbalení/sbalení (výchozí je zavřeno)
 const isOpen = ref(false)
 
 const availableAlgorithms = [
@@ -120,7 +112,7 @@ async function sendToBackend(id, newAlgorithm) {
 
   } catch (error) {
     console.error("Chyba při změně algoritmu:", error);
-    alert("Nepodařilo se změnit algoritmus. Běží backend?");
+    alert("Nepodařilo se změnit algoritmu. Běží backend?");
   }
 }
 </script>

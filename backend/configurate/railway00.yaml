@@ -1,0 +1,93 @@
+# Globální informace o konfiguraci
+nazev_kolejiste: "Hlavní trať Brno - Havlíčkův Brod"
+umisteni: "Klubovna"
+verze: "1.0"
+poznamka: "Rozšířená konfigurace pro 4 stanice a 16 prvků"
+
+skupiny:
+  # --- 1. STANICE ---
+  - nazev: "Nádraží Kuřim"
+    poznamka: "Hlavní stanice a přilehlé kolejiště"
+    polozky:
+      # Podskupina v Kuřimi
+      - nazev: "Budova nádraží"
+        polozky:
+          - nazev: "Čekárna a kasy"
+            algoritmus: "domacnost"
+            adresa: "1:0"
+
+          - nazev: "Kancelář výpravčího"
+            algoritmus: "trvale_zapnuto"
+            adresa: "1:1"
+
+      # Další podskupina v Kuřimi
+      - nazev: "Nástupiště a perony"
+        polozky:
+          - nazev: "Peron 1"
+            algoritmus: "drazni_osvetleni"
+            adresa: "1:2"
+
+          - nazev: "Peron 2"
+            algoritmus: "drazni_osvetleni"
+            adresa: "1:3"
+
+  # --- 2. STANICE ---
+  - nazev: "Město Židenice"
+    poznamka: "Rezidenční a komerční oblast u trati"
+    polozky:
+      # Zde jsou prvky rovnou pod stanicí (bez podskupin)
+      - nazev: "Ulice Nádražní"
+        algoritmus: "poulicni_lampa"
+        adresa: "1:4"
+
+      - nazev: "Hospoda U Zastávky"
+        algoritmus: "disco"
+        adresa: "1:5"
+
+      - nazev: "Bytovka - přízemí"
+        algoritmus: "domacnost"
+        adresa: "1:6"
+
+      - nazev: "Odstavená budova"
+        algoritmus: "trvale_vypnuto"
+        adresa: "1:7"
+
+  # --- 3. STANICE ---
+  - nazev: "Zastávka Česká"
+    poznamka: "Malá lokální zastávka v lese"
+    polozky:
+      - nazev: "Přístřešek pro cestující"
+        algoritmus: "poulicni_lampa"
+        adresa: "1:8"
+
+      - nazev: "Lampa na přejezdu"
+        algoritmus: "drazni_osvetleni"
+        adresa: "1:9"
+
+      - nazev: "Hradlo"
+        algoritmus: "domacnost"
+        adresa: "1:10"
+
+      - nazev: "Služební cesta"
+        algoritmus: "drazni_osvetleni"
+        adresa: "1:11"
+
+  # --- 4. STANICE ---
+  - nazev: "Skryté nádraží"
+    poznamka: "Technické zázemí pod panelem, není vidět zvenku"
+    polozky:
+      - nazev: "Servisní osvětlení - sekce A"
+        algoritmus: "trvale_zapnuto"
+        adresa: "1:12"
+
+      - nazev: "Servisní osvětlení - sekce B"
+        algoritmus: "trvale_vypnuto"
+        adresa: "1:13"
+
+      - nazev: "Indikace obsazení koleje 1"
+        algoritmus: "trvale_zapnuto"
+        adresa: "1:14"
+
+      - nazev: "Indikace obsazení koleje 2"
+        algoritmus: "trvale_vypnuto"
+        adresa: "1:15"

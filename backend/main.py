@@ -1,102 +1,69 @@
-#!/usr/bin/env python3
-# main.py
+import uvicorn
+import threading
 
-import socket
-import asyncio
-from contextlib import asynccontextmanager
-from datetime import datetime
-import yaml
+from mtb import DaemonClient, EDaemonResponse
+from configurate import load_configuration, ConfigManager
+from web import app
 
-from mtb import *
+sunrise, sunset, config_file = load_configuration()
+print(f"Východ: {sunrise}")
 
-# Pro FastAPI a propojení s api.py
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import api
-
-# Lokální pomocné proměnné, které pak nakopírujeme do app.state
-sunrise, sunset = None, None
+# 1. Vytvoření jediné hlavní instance správce konfigurace přímo v main.py
+manager = ConfigManager()
 
 
-def configLoad():
-    global sunrise, sunset
-    with open("config.yaml", "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-
-        sunrise_str = data["light"]["sunrise"]
-        sunset_str = data["light"]["sunset"]
-
-        sunrise = datetime.strptime(sunrise_str, '%H:%M').time()
-        sunset = datetime.strptime(sunset_str, "%H:%M").time()
-
-
-async def mtb_background_loop(app: FastAPI):
-    print("[MTB] Spouštím pozadí pro komunikaci s daemonem...")
-
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setblocking(False)
-
-    # Uložíme socket do stavu aplikace, aby na něj vidělo api.py
-    app.state.sock = sock
-
-    loop = asyncio.get_event_loop()
-    await loop.sock_connect(sock, ('127.0.0.1', 3841))
-    print("[MTB] Úspěšně připojeno k MTB daemonu.")
-
-    request_response(sock, {
-        'command': 'module_set_outputs',
-        'address': 1,
-        'outputs': {
-            0: {'type': 'plain', 'value': 1},
-        },
-    })
-
+def ovladani_konzole():
     while True:
-        try:
-            data = await loop.sock_recv(sock, 0xFFFF)
-            if data:
-                data_decoded = data.decode('utf-8').strip()
-        except Exception as e:
-            print(f"[MTB Chyba] Problém ve smyčce na pozadí: {e}")
+        prikaz = input()
+        if prikaz.strip().lower() == 'p':
+            print("\n=== Aktuální struktura kolejiště ===")
 
-        await asyncio.sleep(0.5)
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Spouštím aplikaci a načítám konfiguraci...")
-    configLoad()
-    print(f"Východ slunce je v {sunrise} a západ slunce je v {sunset}")
-
-    # Uložení časů do stavu aplikace pro api.py
-    app.state.sunrise = sunrise
-    app.state.sunset = sunset
-    app.state.sock = None  # Výchozí hodnota, než se připojí smyčka
-
-    # Předáme 'app' do smyčky na pozadí
-    asyncio.create_task(mtb_background_loop(app))
-    yield
-
-    if app.state.sock:
-        print("Zavírám socket k MTB daemonu...")
-        app.state.sock.close()
+            # Konzole používá naši hlavní instanci manager z tohoto souboru
+            manager.print_structure()
+            print("====================================\n")
 
 
-# Inicializace FastAPI
-app = FastAPI(lifespan=lifespan)
+def udrzuj_demona(daemon):
+    try:
+        daemon.keep_alive()
+    except Exception as e:
+        print(f"Spojení s démonem bylo přerušeno: {e}")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-# Propojení směrovače z api.py (Teď už to projde bez chyby!)
-app.include_router(api.router)
+def main() -> None:
+    global daemon
+    tree, flat_list = manager.load_yaml('configurate/railway00.yaml')
+
+    # Předání sdílených dat webové aplikaci
+    app.state.manager = manager
+    app.state.sunrise = str(sunrise)
+    app.state.sunset = str(sunset)
+
+    try:
+        daemon = DaemonClient()
+        app.state.daemon = daemon
+
+        print("Démon připojen. Odesílám počáteční stavy světel...")
+        # Úvodní nastavení hardwaru hned po startu
+        manager.update_hardware(daemon, str(sunrise), str(sunset))
+
+        daemon_vlakno = threading.Thread(target=udrzuj_demona, args=(daemon,), daemon=True)
+        daemon_vlakno.start()
+
+        # Vlákno smycka_osvetleni zatím spouštět nemusíme,
+        # protože teď reagujeme jen na okamžité změny z webu.
+
+    except EDaemonResponse as e:
+        print(f"Chyba při komunikaci s démonem: {e}")
+    except ConnectionRefusedError:
+        print("Nepodařilo se připojit k MTB démonovi. Běží na portu 3841?")
+
+    konzole_vlakno = threading.Thread(target=ovladani_konzole, daemon=True)
+    konzole_vlakno.start()
+
+    print("Startuji webový server na http://127.0.0.1:8000")
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
 
 if __name__ == '__main__':
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    main()

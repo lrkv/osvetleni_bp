@@ -1,98 +1,98 @@
-# Globální informace o konfiguraci
-nazev_kolejiste: "Hlavní trať Brno - Havlíčkův Brod"
-umisteni: "Klubovna"
-verze: "1.0"
-poznamka: "Rozšířená konfigurace pro 4 stanice a 16 prvků"
+# Global configuration information
+layout_name: "Hlavní trať Brno - Havlíčkův Brod"
+location: "Klubovna"
+version: "1.0"
+note: "Rozšířená konfigurace pro 4 stanice a 16 prvků"
 
-skupiny:
-  # --- 1. STANICE ---
-  - nazev: "Nádraží Kuřim"
-    poznamka: "Hlavní stanice a přilehlé kolejiště"
-    polozky:
-      # Podskupina v Kuřimi
-      - nazev: "Budova nádraží"
-        polozky:
-          - nazev: "Čekárna a kasy"
-            algoritmus: "domacnost"
-            adresa: "1:0"
+groups:
+  # --- 1. STATION ---
+  - name: "Nádraží Kuřim"
+    note: "Hlavní stanice a přilehlé kolejiště"
+    items:
+      # Subgroup in Kuřim
+      - name: "Budova nádraží"
+        items:
+          - name: "Čekárna a kasy"
+            algorithm: "domacnost"
+            address: "1:0"
 
-          - nazev: "Kancelář výpravčího"
-            algoritmus: "trvale_zapnuto"
-            adresa: "1:1"
+          - name: "Kancelář výpravčího"
+            algorithm: "trvale_zapnuto"
+            address: "1:1"
 
-      # Další podskupina v Kuřimi
-      - nazev: "Nástupiště a perony"
-        polozky:
-          - nazev: "Peron 1"
-            algoritmus: "drazni_osvetleni"
-            adresa: "1:2"
+      # Another subgroup in Kuřim
+      - name: "Nástupiště a perony"
+        items:
+          - name: "Peron 1"
+            algorithm: "drazni_osvetleni"
+            address: "1:2"
 
-          - nazev: "Peron 2"
-            algoritmus: "drazni_osvetleni"
-            adresa: "1:3"
+          - name: "Peron 2"
+            algorithm: "drazni_osvetleni"
+            address: "1:3"
 
-  # --- 2. STANICE ---
-  - nazev: "Město Židenice"
-    poznamka: "Rezidenční a komerční oblast u trati"
-    polozky:
-      # Zde jsou prvky rovnou pod stanicí (bez podskupin)
-      - nazev: "Ulice Nádražní"
-        algoritmus: "poulicni_lampa"
-        adresa: "1:4"
+  # --- 2. STATION ---
+  - name: "Město Židenice"
+    note: "Rezidenční a komerční oblast u trati"
+    items:
+      # Items directly under the station (no subgroups)
+      - name: "Ulice Nádražní"
+        algorithm: "poulicni_lampa"
+        address: "1:4"
 
-      - nazev: "Hospoda U Zastávky"
-        algoritmus: "disco"
-        adresa: "1:5"
+      - name: "Hospoda U Zastávky"
+        algorithm: "disco"
+        address: "1:5"
 
-      - nazev: "Bytovka - přízemí"
-        algoritmus: "domacnost"
-        adresa: "1:6"
+      - name: "Bytovka - přízemí"
+        algorithm: "domacnost"
+        address: "1:6"
 
-      - nazev: "Odstavená budova"
-        algoritmus: "trvale_vypnuto"
-        adresa: "1:7"
+      - name: "Odstavená budova"
+        algorithm: "trvale_vypnuto"
+        address: "1:7"
 
-  # --- 3. STANICE ---
-  - nazev: "Zastávka Česká"
-    poznamka: "Malá lokální zastávka v lese"
-    polozky:
-      - nazev: "Přístřešek pro cestující"
-        algoritmus: "poulicni_lampa"
-        adresa: "1:8"
+  # --- 3. STATION ---
+  - name: "Zastávka Česká"
+    note: "Malá lokální zastávka v lese"
+    items:
+      - name: "Přístřešek pro cestující"
+        algorithm: "poulicni_lampa"
+        address: "1:8"
 
-      - nazev: "Lampa na přejezdu"
-        algoritmus: "drazni_osvetleni"
-        adresa: "1:9"
+      - name: "Lampa na přejezdu"
+        algorithm: "drazni_osvetleni"
+        address: "1:9"
 
-      - nazev: "Hradlo"
-        algoritmus: "domacnost"
-        adresa: "1:10"
+      - name: "Hradlo"
+        algorithm: "domacnost"
+        address: "1:10"
 
-      - nazev: "Služební cesta"
-        algoritmus: "drazni_osvetleni"
-        adresa: "1:11"
+      - name: "Služební cesta"
+        algorithm: "drazni_osvetleni"
+        address: "1:11"
 
-  # --- 4. STANICE ---
-  - nazev: "Skryté nádraží"
-    poznamka: "Technické zázemí pod panelem, není vidět zvenku"
-    polozky:
-      - nazev: "Servisní osvětlení - sekce A"
-        algoritmus: "trvale_zapnuto"
-        adresa: "1:12"
+  # --- 4. STATION ---
+  - name: "Skryté nádraží"
+    note: "Technické zázemí pod panelem, není vidět zvenku"
+    items:
+      - name: "Servisní osvětlení - sekce A"
+        algorithm: "trvale_zapnuto"
+        address: "1:12"
 
-      - nazev: "Servisní osvětlení - sekce B"
-        algoritmus: "trvale_vypnuto"
-        adresa: "1:13"
+      - name: "Servisní osvětlení - sekce B"
+        algorithm: "trvale_vypnuto"
+        address: "1:13"
 
-      - nazev: "obchod"
-        poznamka: "nic"
-        polozky:
-          - nazev: "výloha"
-            poznamky: "je rozbitá"
-            polozky:
-              - nazev: "LED panel"
-                algoritmus: "disco"
-                adresa: "1:14"
-          - nazev: "reflektor"
-            algoritmus: "trvale-zapnuto"
-            adresa: "1:15"
+      - name: "obchod"
+        note: "nic"
+        items:
+          - name: "výloha"
+            notes: "je rozbitá"
+            items:
+              - name: "LED panel"
+                algorithm: "disco"
+                address: "1:14"
+          - name: "reflektor"
+            algorithm: "trvale-zapnuto"
+            address: "1:15"

@@ -6,11 +6,9 @@ from configurate import load_configuration, ConfigManager
 from web import app
 
 sunrise, sunset, config_file = load_configuration()
-print(f"Východ: {sunrise}")
 
 # 1. Vytvoření jediné hlavní instance správce konfigurace přímo v main.py
 manager = ConfigManager()
-
 
 def ovladani_konzole():
     while True:
@@ -21,7 +19,6 @@ def ovladani_konzole():
             # Konzole používá naši hlavní instanci manager z tohoto souboru
             manager.print_structure()
             print("====================================\n")
-
 
 def udrzuj_demona(daemon):
     try:

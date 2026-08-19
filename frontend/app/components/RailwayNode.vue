@@ -4,30 +4,49 @@
     <!-- Vykreslení nadřazené skupiny -->
     <div v-if="node.polozky">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-2">
-        <div>
-          <h3 class="text-lg font-semibold text-slate-800">{{ node.nazev }}</h3>
-          <p v-if="node.poznamka" class="text-sm text-slate-500 italic">{{ node.poznamka }}</p>
+
+        <!-- Klikatelná hlavička pro sbalení/rozbalení -->
+        <div
+          @click="isOpen = !isOpen"
+          class="flex-1 cursor-pointer group flex items-center gap-3"
+        >
+          <!-- Šipka, která se otáčí podle stavu isOpen -->
+          <svg
+            :class="{'rotate-90': isOpen}"
+            class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-transform duration-200"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+
+          <div>
+            <h3 class="text-lg font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors">{{ node.nazev }}</h3>
+            <p v-if="node.poznamka" class="text-sm text-slate-500 italic">{{ node.poznamka }}</p>
+          </div>
         </div>
 
         <!-- Hromadná změna (volá funkci updateGroup) -->
         <select
           @change="updateGroup($event)"
-          class="text-sm border border-slate-300 rounded-lg px-3 py-1.5 bg-slate-50 text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+          class="w-56 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors shadow-sm"
         >
           <option value="" disabled selected>Změnit vše na...</option>
           <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algo }}</option>
         </select>
       </div>
 
-      <RailwayNode
-        v-for="(child, index) in node.polozky"
-        :key="child.id || index"
-        :node="child"
-      />
+      <!-- Samotný obsah skupiny, zobrazený jen když je rozbaleno (v-show) -->
+      <div v-show="isOpen" class="mt-4">
+        <RailwayNode
+          v-for="(child, index) in node.polozky"
+          :key="child.id || index"
+          :node="child"
+        />
+      </div>
     </div>
 
     <!-- Vykreslení konkrétního koncového světla -->
-    <div v-else class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 transition-all hover:shadow-md">
+    <div v-else class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 transition-all hover:shadow-md hover:border-indigo-100">
       <div>
         <h4 class="font-medium text-slate-900">{{ node.nazev }}</h4>
         <div class="text-xs text-slate-500 mt-1.5 flex gap-3">
@@ -36,11 +55,11 @@
         </div>
       </div>
 
-      <!-- Jednosměrná vazba :value místo zakázaného v-model (prop nesmíme upravovat lokálně) -->
+      <!-- Stejný styl selectu jako u skupiny -->
       <select
         :value="node.algoritmus"
         @change="updateSingle($event)"
-        class="text-sm border font-semibold border-indigo-200 rounded-full px-3 py-1 bg-indigo-50 text-indigo-700 cursor-pointer hover:bg-indigo-100 focus:outline-none"
+        class="w-56 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors shadow-sm"
       >
         <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algo }}</option>
       </select>
@@ -50,12 +69,17 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 const props = defineProps({
   node: {
     type: Object,
     required: true
   }
 })
+
+// Nový stav pro rozbalení/sbalení (výchozí je zavřeno)
+const isOpen = ref(false)
 
 const availableAlgorithms = [
   "trvale_zapnuto",
@@ -66,18 +90,15 @@ const availableAlgorithms = [
   "disco"
 ]
 
-// 1. Ošetření akce pro celou skupinu
 async function updateGroup(event) {
   const newAlgorithm = event.target.value;
   if (!newAlgorithm) return;
 
   await sendToBackend(props.node.id, newAlgorithm);
 
-  // Po odeslání roletku vizuálně vrátíme do neutrálního stavu
   event.target.value = "";
 }
 
-// 2. Ošetření akce pro jedno světlo
 async function updateSingle(event) {
   const newAlgorithm = event.target.value;
   if (!newAlgorithm) return;
@@ -85,7 +106,6 @@ async function updateSingle(event) {
   await sendToBackend(props.node.id, newAlgorithm);
 }
 
-// 3. Společná komunikace s Pythonem
 async function sendToBackend(id, newAlgorithm) {
   try {
     await $fetch('http://127.0.0.1:8000/api/algorithm', {
@@ -96,7 +116,6 @@ async function sendToBackend(id, newAlgorithm) {
       }
     });
 
-    // Klíčový příkaz: Vyvolá opětovné stažení dat z backendu a okamžitě překreslí komponenty
     await refreshNuxtData('kolejiste');
 
   } catch (error) {

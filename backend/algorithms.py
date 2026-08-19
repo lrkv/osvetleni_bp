@@ -42,20 +42,26 @@ def evaluate_algorithm(algorithm_name: str, sunrise_str: str = "00:00", sunset_s
         now = datetime.now()
         today = now.date()
 
-        # Převod textových časů z main.py na počitatelné objekty pro dnešní den
         sunrise_dt = parse_time_to_datetime(sunrise_str, today)
         sunset_dt = parse_time_to_datetime(sunset_str, today)
 
-        # Matematický posun času přesně podle zadání
-        lights_off_time = sunrise_dt + timedelta(hours=1)  # Vypne se hodinu po východu
-        lights_on_time = sunset_dt - timedelta(hours=1)  # Zapne se hodinu před západem
+        lights_off_time = sunrise_dt + timedelta(hours=1)
+        lights_on_time = sunset_dt - timedelta(hours=1)
 
-        # Lampa svítí přes noc: od 'lights_on_time', přes půlnoc, až po 'lights_off_time'
         if now >= lights_on_time or now <= lights_off_time:
             return 1
         else:
             return 0
 
-    # Ostatní složitější algoritmy (domacnost, drazni_osvetleni) vyřešíme pak.
-    # Zatím je necháme jako vypnuté.
+    # --- 3. Simulace domácnosti (sudá/lichá minuta) ---
+    elif algorithm_name == "domacnost":
+        now = datetime.now()
+
+        # Zjištění, zda je aktuální minuta sudá
+        if now.minute % 2 == 0:
+            return 1  # Sudá minuta -> svítí
+        else:
+            return 0  # Lichá minuta -> nesvítí
+
+    # Výchozí ochrana pro neznámé algoritmy
     return 0

@@ -31,7 +31,6 @@ class UpdateRequest(BaseModel):
 @app.post("/api/algorithm")
 def update_algorithm(req: UpdateRequest, request: Request):
     manager = request.app.state.manager
-    # Bezpečné načtení démona a časů z app.state
     daemon = getattr(request.app.state, 'daemon', None)
     sunrise = getattr(request.app.state, 'sunrise', "05:00")
     sunset = getattr(request.app.state, 'sunset', "21:00")
@@ -39,8 +38,10 @@ def update_algorithm(req: UpdateRequest, request: Request):
     # Zápis nového algoritmu do vnitřní paměti
     success = manager.change_algorithm(req.item_id, req.new_algorithm)
 
-    # Okamžitý propis do kolejiště, pokud je připojený démon
-    if success and daemon:
+    # OPRAVA: Metodu pro aktualizaci voláme VŽDY.
+    # Tím se uvnitř vypočítá proměnná 'is_on', díky které se obarví web.
+    # O neodeslání dat do odpojeného hardwaru se postará úprava z kroku 1.
+    if success:
         manager.update_hardware(daemon, sunrise, sunset)
 
     return {"success": success, "updated_id": req.item_id, "algorithm": req.new_algorithm}

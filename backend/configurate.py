@@ -114,6 +114,10 @@ class ConfigManager:
                 from algorithms import evaluate_algorithm
                 output_val = evaluate_algorithm(item['algorithm'], sunrise, sunset)
 
+                # NOVÉ: Uložení logického stavu přímo do prvku.
+                # Pokud je hodnota větší než 0 (svítí nebo bliká), bude is_on = True.
+                item['is_on'] = output_val > 0
+
                 # Pokud modul ještě v payloadu nemáme, založíme mu prázdný slovník pro porty
                 if module_addr not in modules_payload:
                     modules_payload[module_addr] = {}
@@ -122,9 +126,10 @@ class ConfigManager:
                 modules_payload[module_addr][port] = output_val
 
         # Projdeme připravený payload a rozešleme ho po modulech
-        for module_addr, ports_data in modules_payload.items():
-            try:
-                # Odesílá se přesně ve formátu: daemon.set_outputs(1, {0: 1, 1: 0})
-                daemon.set_outputs(module_address=module_addr, outputs_data=ports_data)
-            except Exception as e:
-                print(f"Chyba při odesílání na modul {module_addr}: {e}")
+        if daemon is not None:
+            for module_addr, ports_data in modules_payload.items():
+                try:
+                    # Odesílá se přesně ve formátu: daemon.set_outputs(1, {0: 1, 1: 0})
+                    daemon.set_outputs(module_address=module_addr, outputs_data=ports_data)
+                except Exception as e:
+                    print(f"Chyba při odesílání na modul {module_addr}: {e}")

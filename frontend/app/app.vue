@@ -34,7 +34,23 @@
 </template>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
+
 const { data, pending, error } = await useFetch('http://127.0.0.1:8000/api/structure', {
   key: 'kolejiste'
+})
+
+let interval;
+
+// Jakmile se stránka načte, spustíme tiché dotazování na pozadí
+onMounted(() => {
+  interval = setInterval(() => {
+    refreshNuxtData('kolejiste')
+  }, 5000) // 5000 milisekund = 5 vteřin
+})
+
+// Pokud by uživatel odešel jinam, smyčku bezpečně zrušíme
+onUnmounted(() => {
+  clearInterval(interval)
 })
 </script>

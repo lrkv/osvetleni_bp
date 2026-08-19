@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="přidání konfigurace LRKV, oprava na anglické názvy">
+      <change beforePath="$PROJECT_DIR$/backend/algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/configurate.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/configurate/lrkv_tt.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate/lrkv_tt.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/web.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/web.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/app.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/components/RailwayNode.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/components/RailwayNode.vue" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="verze2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;CestmirKolarik&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/lrkv/osvetleni_bp.git&quot;,
+    &quot;accountId&quot;: &quot;cdf87744-2736-4495-b4fe-c37e644141bb&quot;
+  }
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="3Ax1ljwkWgjizDPuIVWs9wLuEDs" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "LaTeX.test.executor": "Run",
+    "LaTeX.uvod.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.configurate.executor": "Run",
+    "Python.data.executor": "Run",
+    "Python.main (1).executor": "Run",
+    "Python.main (2).executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.mainy.executor": "Run",
+    "Python.mapa.executor": "Run",
+    "Python.nastroje.executor": "Run",
+    "Python.struktura.executor": "Run",
+    "Python.zk.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/Česťa/PycharmProjects/osvetleni_bp/zk/typovaKontrola",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.build.executor": "Run",
+    "npm.dev.executor": "Run",
+    "npm.lan.executor": "Run",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\PyCharm 2025.3.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Česťa\PycharmProjects\osvetleni_bp\zk\typovaKontrola" />
+      <recent name="C:\Users\Česťa\PycharmProjects\osvetleni_bp\dokumenty" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Česťa\PycharmProjects\osvetleni_bp\frontend\app" />
+      <recent name="C:\Users\Česťa\PycharmProjects\osvetleni_bp\backend" />
+      <recent name="C:\Users\Česťa\PycharmProjects\osvetleni_bp" />
+    </key>
+  </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="pip install tzdata" />
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.main (2)">
+    <configuration name="configurate" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="osvetleni_bp" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/configurate.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main (2)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="osvetleni_bp" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="zk" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="osvetleni_bp" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/backend" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/backend/zk.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/frontend/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main (2)" />
+        <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build" />
+        <item itemvalue="Python.configurate" />
+        <item itemvalue="Python.zk" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PY-253.31033.139" />
+        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="" />
+      <created>1773420219046</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1773420219046</updated>
+      <workItem from="1773420235866" duration="925000" />
+      <workItem from="1773519561622" duration="6619000" />
+      <workItem from="1773526275733" duration="52000" />
+      <workItem from="1773526341611" duration="484000" />
+      <workItem from="1773526846920" duration="559000" />
+      <workItem from="1773527716152" duration="261000" />
+      <workItem from="1773528311811" duration="11455000" />
+      <workItem from="1775601654403" duration="20754000" />
+      <workItem from="1778502004678" duration="319000" />
+      <workItem from="1781136454917" duration="713000" />
+      <workItem from="1781567874363" duration="5461000" />
+      <workItem from="1783559403617" duration="2198000" />
+      <workItem from="1786970348596" duration="14764000" />
+      <workItem from="1787093874992" duration="15225000" />
+    </task>
+    <task id="LOCAL-00001" summary="úvodní nástřel">
+      <option name="closed" value="true" />
+      <created>1773612628982</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1773612628982</updated>
+    </task>
+    <task id="LOCAL-00002" summary="úvodní nástřel">
+      <option name="closed" value="true" />
+      <created>1773612828382</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1773612828382</updated>
+    </task>
+    <task id="LOCAL-00003" summary="úvodní nástřel">
+      <option name="closed" value="true" />
+      <created>1773613114004</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1773613114004</updated>
+    </task>
+    <task id="LOCAL-00004" summary="postup">
+      <option name="closed" value="true" />
+      <created>1775943071846</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1775943071846</updated>
+    </task>
+    <task id="LOCAL-00005" summary="postup">
+      <option name="closed" value="true" />
+      <created>1775943278200</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1775943278200</updated>
+    </task>
+    <task id="LOCAL-00006" summary="starší verze">
+      <option name="closed" value="true" />
+      <created>1781567994959</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1781567994959</updated>
+    </task>
+    <task id="LOCAL-00007" summary="nová verze">
+      <option name="closed" value="true" />
+      <created>1781570179577</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781570179577</updated>
+    </task>
+    <task id="LOCAL-00008" summary="verze 1">
+      <option name="closed" value="true" />
+      <created>1787098579587</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1787098579587</updated>
+    </task>
+    <task id="LOCAL-00009" summary="úprava dat ve struktuře">
+      <option name="closed" value="true" />
+      <created>1787098896798</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1787098896798</updated>
+    </task>
+    <task id="LOCAL-00010" summary="algoritmus ulice, hezčí web">
+      <option name="closed" value="true" />
+      <created>1787099971971</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1787099971971</updated>
+    </task>
+    <task id="LOCAL-00011" summary="anglické klíče">
+      <option name="closed" value="true" />
+      <created>1787140519628</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1787140519628</updated>
+    </task>
+    <task id="LOCAL-00012" summary="TT LRKV">
+      <option name="closed" value="true" />
+      <created>1787142514155</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1787142514155</updated>
+    </task>
+    <task id="LOCAL-00013" summary="přidání konfigurace LRKV, oprava na anglické názvy">
+      <option name="closed" value="true" />
+      <created>1787144050553</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1787144050553</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="úvodní nástřel" />
+    <MESSAGE value="postup" />
+    <MESSAGE value="starší verze" />
+    <MESSAGE value="nová verze" />
+    <MESSAGE value="verze 1" />
+    <MESSAGE value="úprava dat ve struktuře" />
+    <MESSAGE value="algoritmus ulice, hezčí web" />
+    <MESSAGE value="anglické klíče" />
+    <MESSAGE value="TT LRKV" />
+    <MESSAGE value="přidání konfigurace LRKV, oprava na anglické názvy" />
+    <option name="LAST_COMMIT_MESSAGE" value="přidání konfigurace LRKV, oprava na anglické názvy" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/osvetleni_bp$main__2_.coverage" NAME="main (2) Coverage Results" MODIFIED="1787145804996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$mapa.coverage" NAME="mapa Coverage Results" MODIFIED="1778502313293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$data.coverage" NAME="data Coverage Results" MODIFIED="1781570935317" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$main.coverage" NAME="main Coverage Results" MODIFIED="1775817135428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/dokumenty/oslava" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$mainy.coverage" NAME="mainy Coverage Results" MODIFIED="1775817116383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$struktura.coverage" NAME="struktura Coverage Results" MODIFIED="1775939975721" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$zk.coverage" NAME="zk Coverage Results" MODIFIED="1786999472144" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$nastroje.coverage" NAME="nastroje Coverage Results" MODIFIED="1773523683862" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1776040842343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$configurate.coverage" NAME="configurate Coverage Results" MODIFIED="1787077657854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+  </component>
+</project>

@@ -84,10 +84,15 @@ skupiny:
         algoritmus: "trvale_vypnuto"
         adresa: "1:13"
 
-      - nazev: "Indikace obsazení koleje 1"
-        algoritmus: "trvale_zapnuto"
-        adresa: "1:14"
-
-      - nazev: "Indikace obsazení koleje 2"
-        algoritmus: "trvale_vypnuto"
-        adresa: "1:15"
+      - nazev: "obchod"
+        poznamka: "nic"
+        polozky:
+          - nazev: "výloha"
+            poznamky: "je rozbitá"
+            polozky:
+              - nazev: "LED panel"
+                algoritmus: "disco"
+                adresa: "1:14"
+          - nazev: "reflektor"
+            algoritmus: "trvale-zapnuto"
+            adresa: "1:15"

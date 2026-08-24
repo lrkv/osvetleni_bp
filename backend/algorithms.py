@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-
 def parse_time_to_datetime(time_str: str, current_date: datetime.date) -> datetime:
     """
     Pomocná funkce, která vezme text (např. '5:32') a dnešní datum,
@@ -17,7 +16,6 @@ def parse_time_to_datetime(time_str: str, current_date: datetime.date) -> dateti
         hour=hours,
         minute=minutes
     )
-
 
 def evaluate_algorithm(algorithm_name: str, sunrise_str: str = "00:00", sunset_str: str = "00:00") -> int:
     """

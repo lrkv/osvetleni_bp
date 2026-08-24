@@ -4,7 +4,7 @@
 
       <header class="mb-8">
         <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Správa osvětlení kolejiště</h1>
-        <p v-if="pending" class="text-slate-500 mt-2 animate-pulse">Načítám konfiguraci z backendu...</p>
+        <p v-if="pending && !data" class="text-slate-500 mt-2 animate-pulse">Načítám konfiguraci z backendu...</p>
         <p v-else-if="error" class="text-red-500 mt-2 font-medium">Chyba připojení k API: {{ error.message }}</p>
       </header>
 

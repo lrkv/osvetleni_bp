@@ -2,3 +2,6 @@ light:
   sunrise: "5:32"
   sunset: "20:09"
 configurate: "lrkv_tt.yaml"
+mtb:
+  mtb_ip: ""
+  mtb_port: ""

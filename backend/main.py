@@ -3,7 +3,7 @@ import threading
 import time
 
 from mtb import DaemonClient, EDaemonResponse
-from configurate import load_configuration, ConfigManager
+from layout import load_configuration, ConfigManager
 from web import app
 
 sunrise, sunset, config_file = load_configuration()

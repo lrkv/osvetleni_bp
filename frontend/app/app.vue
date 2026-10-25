@@ -84,7 +84,6 @@ const themes = [
   { value: 'blue', label: 'Modrý', color: '#0871f4' },
   { value: 'red', label: 'Červený', color: '#cd0f0f' },
   { value: 'black', label: 'Černý', color: '#111111' },
-  { value: 'cyan', label: 'Cyan', color: '#00FFFF' },
 ]
 provide('lighting', lighting)
 provide('appearance', appearance)

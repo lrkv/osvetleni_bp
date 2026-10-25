@@ -1,71 +1,42 @@
 <template>
-  <div class="ml-4 mt-3 border-l-2 border-slate-200 pl-4">
+  <div class="railway-node">
+    <section v-if="node.items" class="node-group">
+      <div class="group-header">
+        <button class="group-toggle" @click="isOpen = !isOpen" :aria-expanded="isOpen">
+          <svg class="chevron" :class="{ expanded: isOpen }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+          <span class="group-name">{{ node.name }}<small v-if="node.note">{{ node.note }}</small></span>
 
-    <!-- VYKRESLENÍ SKUPINY -->
-    <div v-if="node.items">
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-2">
-
-        <div
-          @click="isOpen = !isOpen"
-          class="flex-1 cursor-pointer group flex items-center gap-3"
-        >
-          <svg :class="{'rotate-90': isOpen}" class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-
-          <div>
-            <h3 class="text-lg font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center gap-2">
-              {{ node.name }}
-
-              <!-- NOVÉ: Dynamické tečky podle vypočítaného stavu skupiny -->
-              <span v-if="groupStatus === 'all'" class="inline-block w-3 h-3 rounded-full bg-amber-400 shadow-sm" title="Vše svítí"></span>
-              <span v-else-if="groupStatus === 'some'" class="inline-block w-3 h-3 rounded-full bg-amber-200 shadow-sm" title="Něco svítí"></span>
-              <span v-else-if="groupStatus === 'none'" class="inline-block w-3 h-3 rounded-full bg-slate-300 shadow-inner" title="Nic nesvítí"></span>
-            </h3>
-            <p v-if="node.note" class="text-sm text-slate-500 italic">{{ node.note }}</p>
-          </div>
-        </div>
-
-        <select @change="updateGroup($event)" class="w-56 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors shadow-sm">
-          <option value="" disabled selected>Změnit vše na...</option>
+        </button>
+        <span class="node-state" :title="statusLabels[groupStatus]" :aria-label="statusLabels[groupStatus]" role="img"><i class="status-dot" :class="groupStatus"></i></span>
+        <select :disabled="saving || !connected" @change="updateGroup" :aria-label="'Změnit algoritmus celé skupiny ' + node.name">
+          <option value="" disabled selected>Změnit vše na…</option>
           <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algo }}</option>
         </select>
       </div>
-
-      <div v-show="isOpen" class="mt-4">
-        <RailwayNode v-for="(child, index) in node.items" :key="child.id || index" :node="child" />
+      <div v-show="isOpen" class="group-children">
+        <RailwayNode v-for="child in node.items" :key="child.id" :node="child" />
       </div>
-    </div>
-
-    <!-- VYKRESLENÍ KONKRÉTNÍHO SVĚTLA -->
-    <div v-else :class="[
-      'p-4 rounded-xl shadow-sm border my-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 transition-all hover:shadow-md',
-      node.is_on ? 'bg-amber-50 border-amber-300' : 'bg-white border-slate-100 hover:border-indigo-100'
-    ]">
-      <div>
-        <h4 class="font-medium text-slate-900 flex items-center gap-2">
-          {{ node.name }}
-          <span v-if="node.is_on" class="relative flex h-2.5 w-2.5" title="Svítí">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-          </span>
-        </h4>
-        <div class="text-xs text-slate-500 mt-1.5 flex gap-3">
-          <span>Adresa: <strong class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">{{ node.address }}</strong></span>
-          <span>ID: {{ node.id }}</span>
+    </section>
+    <article v-else class="light-card" :class="{ 'is-on': node.is_on }">
+      <span class="node-state" :title="node.is_on ? 'Svítí' : 'Vypnuto'" :aria-label="node.is_on ? 'Svítí' : 'Vypnuto'" role="img"><i class="status-dot" :class="node.is_on ? 'all' : 'none'"></i></span>
+      <div class="light-description">
+        <div class="light-heading"><h3>{{ node.name }}</h3></div>
+        <p v-if="node.note" class="muted small">{{ node.note }}</p>
+        <div v-if="showAddress || showId" class="light-details">
+          <span v-if="showAddress">Adresa: <strong>{{ node.address }}</strong></span>
+          <span v-if="showId">ID: {{ node.id }}</span>
         </div>
       </div>
-
-      <select :value="node.algorithm" @change="updateSingle($event)" class="w-56 border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-700 cursor-pointer hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 transition-colors shadow-sm">
+      <select :disabled="saving || !connected" :value="node.algorithm" @change="updateSingle" :aria-label="'Algoritmus světla ' + node.name">
+        <option v-if="!availableAlgorithms.includes(node.algorithm)" :value="node.algorithm" disabled>{{ node.algorithm || 'Chybějící algoritmus' }} (nepodporováno)</option>
         <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algo }}</option>
       </select>
-    </div>
-
+    </article>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 
 const props = defineProps({
   node: {
@@ -75,15 +46,11 @@ const props = defineProps({
 })
 
 const isOpen = ref(false)
+const { showAddress, showId } = inject('appearance')
+const statusLabels = { all: 'Vše svítí', some: 'Část svítí', none: 'Vypnuto' }
 
-const availableAlgorithms = [
-  "trvale_zapnuto",
-  "trvale_vypnuto",
-  "domacnost",
-  "poulicni_lampa",
-  "drazni_osvetleni",
-  "disco"
-]
+const { availableAlgorithms, connected, updateAlgorithm } = inject('lighting')
+const saving = ref(false)
 
 // NOVÉ: Chytrý výpočet stavu pro celou skupinu
 const groupStatus = computed(() => {
@@ -114,28 +81,28 @@ const groupStatus = computed(() => {
 })
 
 async function updateGroup(event) {
-  const newAlgorithm = event.target.value;
-  if (!newAlgorithm) return;
-  await sendToBackend(props.node.id, newAlgorithm);
-  event.target.value = "";
+  const select = event.target
+  await sendToBackend(props.node.id, select.value)
+  select.value = ''
 }
 
 async function updateSingle(event) {
-  const newAlgorithm = event.target.value;
-  if (!newAlgorithm) return;
-  await sendToBackend(props.node.id, newAlgorithm);
+  const select = event.target
+  const success = await sendToBackend(props.node.id, select.value)
+  if (!success) select.value = props.node.algorithm
 }
 
 async function sendToBackend(id, newAlgorithm) {
+  if (!newAlgorithm || saving.value) return false
+  saving.value = true
   try {
-    await $fetch('http://127.0.0.1:8000/api/algorithm', {
-      method: 'POST',
-      body: { item_id: id, new_algorithm: newAlgorithm }
-    });
-    await refreshNuxtData('kolejiste');
+    await updateAlgorithm(id, newAlgorithm)
+    return true
   } catch (error) {
-    console.error("Chyba při změně algoritmu:", error);
-    alert("Nepodařilo se změnit algoritmus. Běží backend?");
+    alert(error.data?.detail || error.message || 'Nepodařilo se změnit algoritmus.')
+    return false
+  } finally {
+    saving.value = false
   }
 }
 </script>

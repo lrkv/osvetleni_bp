@@ -1,13 +1,37 @@
+import logging
+from pathlib import Path
+
 import yaml
+from algorithms import CorridorLighting, evaluate_algorithm
 
-def load_configuration(file_source: str = 'config.yaml'):
-    with open(file_source, 'r', encoding='utf-8') as file:
-        data = yaml.safe_load(file)
+logger = logging.getLogger(__name__)
 
+SYSTEM_TIME = object()
+STATIC_ALGORITHMS = {"trvale_zapnuto", "trvale_vypnuto", "vyloha", "disco"}
+
+BASE_DIR = Path(__file__).resolve().parent
+SUPPORTED_ALGORITHMS = ("trvale_zapnuto", "trvale_vypnuto", "domacnost", "poulicni_lampa", "drazni_osvetleni", "byt", "chodba", "prodejna", "vyloha", "disco")
+
+
+def load_settings(file_source=None):
+    path = Path(file_source) if file_source else BASE_DIR / "config.yaml"
+    with path.open(encoding="utf-8") as file:
+        return yaml.safe_load(file)
+
+
+def load_configuration(file_source=None):
+    data = load_settings(file_source)
     return data['light']['sunrise'], data['light']['sunset'], data['configurate']
 
+
 class ConfigManager:
-    def __init__(self):
+    def __init__(self, corridor_pause_min=60, corridor_pause_max=300):
+        # Validate once, before any background task is started.
+        CorridorLighting(corridor_pause_min, corridor_pause_max)
+        self.corridor_pause_min = corridor_pause_min
+        self.corridor_pause_max = corridor_pause_max
+        self._corridors = {}
+        self._last_outputs = {}
         self.tree_data = {}             # Stromová struktura pro web
         self.items_by_id = {}           # Plochý slovník pro rychlé hledání prvků podle ID
         self.next_id = 1                # Počítadlo pro generování unikátních ID
@@ -18,6 +42,10 @@ class ConfigManager:
         return current_id
 
     def load_yaml(self, file_path='railway00.yaml'):
+        self._corridors.clear()
+        self._last_outputs.clear()
+        self.items_by_id.clear()
+        self.next_id = 1
         # Načtení YAML souboru
         with open(file_path, 'r', encoding='utf-8') as file:
             self.tree_data = yaml.safe_load(file)
@@ -30,6 +58,12 @@ class ConfigManager:
         return self.tree_data, self.items_by_id
 
     def _process_item(self, item):
+        # Accept the historical typo, but expose only the canonical key to the UI.
+        if 'adress' in item:
+            if 'address' in item and item['address'] != item['adress']:
+                raise ValueError(f"Rozdílné address a adress u prvku {item.get('name')!r}.")
+            item['address'] = item.pop('adress')
+            logger.warning("Prvek %r: použito 'adress'; v YAML opravte na 'address'.", item.get('name'))
         # 1. Vygenerování a uložení ID přímo do prvku
         item_id = self._generate_id()
         item['id'] = item_id
@@ -71,6 +105,8 @@ class ConfigManager:
                 self.print_structure(child, level + 1)
 
     def change_algorithm(self, target_id: int, new_algorithm: str) -> bool:
+        if new_algorithm not in SUPPORTED_ALGORITHMS:
+            raise ValueError('Neznámý algoritmus.')
         # Vyhledání prvku podle ID v našem rychlém plochém seznamu
         item = self.items_by_id.get(target_id)
         if not item:
@@ -83,6 +119,8 @@ class ConfigManager:
     def _apply_algorithm(self, item: dict, new_algorithm: str) -> None:
         # Pokud má prvek adresu, jedná se o koncové světlo -> změníme algoritmus
         if 'address' in item:
+            if item.get('algorithm') != new_algorithm:
+                self._corridors.pop(item['id'], None)
             item['algorithm'] = new_algorithm
 
         # Pokud má prvek vnořené položky (je to skupina), propíšeme změnu i do nich
@@ -90,46 +128,36 @@ class ConfigManager:
             for child in item['items']:
                 self._apply_algorithm(child, new_algorithm)
 
-    def update_hardware(self, daemon, sunrise: str, sunset: str):
-        """
-        Zkompletuje hodnoty pro všechna světla a odešle je příslušným modulům.
-        """
-        # Slovník, kde klíč je číslo modulu a hodnota je slovník portů a jejich stavů
-        # Příklad naplnění: {1: {0: 1, 1: 0, 12: 60}}
-        modules_payload = {}
-
-        for item_id, item in self.items_by_id.items():
-            # Zajímá nás jen prvek, který má fyzickou adresu a přiřazený algoritmus
-            if 'address' in item and 'algorithm' in item:
-
-                # Rozdělení adresy z formátu "1:12" na modul a port
-                address_parts = item['address'].split(':')
-                if len(address_parts) != 2:
-                    continue  # Pokud je adresa zapsaná špatně, prvek přeskočíme
-
-                module_addr = int(address_parts[0])
-                port = int(address_parts[1])
-
-                # Výpočet stavu (0, 1, nebo 60) podle vybraného algoritmu
-                from algorithms import evaluate_algorithm
-                output_val = evaluate_algorithm(item['algorithm'], sunrise, sunset)
-
-                # NOVÉ: Uložení logického stavu přímo do prvku.
-                # Pokud je hodnota větší než 0 (svítí nebo bliká), bude is_on = True.
-                item['is_on'] = output_val > 0
-
-                # Pokud modul ještě v payloadu nemáme, založíme mu prázdný slovník pro porty
-                if module_addr not in modules_payload:
-                    modules_payload[module_addr] = {}
-
-                # Zapíšeme vypočítanou hodnotu ke konkrétnímu portu
-                modules_payload[module_addr][port] = output_val
-
-        # Projdeme připravený payload a rozešleme ho po modulech
-        if daemon is not None:
-            for module_addr, ports_data in modules_payload.items():
-                try:
-                    # Odesílá se přesně ve formátu: daemon.set_outputs(1, {0: 1, 1: 0})
-                    daemon.set_outputs(module_address=module_addr, outputs_data=ports_data)
-                except Exception as e:
-                    print(f"Chyba při odesílání na modul {module_addr}: {e}")
+    def calculate_outputs(self, sunrise: str, sunset: str, *, now=SYSTEM_TIME):
+        """Compute desired states without any network I/O."""
+        modules = {}
+        time_args = {} if now is SYSTEM_TIME else {"now": now}
+        for item in self.items_by_id.values():
+            if 'address' not in item:
+                continue
+            module, port = map(int, item['address'].split(':'))
+            algorithm = item.get('algorithm')
+            if algorithm != 'chodba':
+                self._corridors.pop(item['id'], None)
+            if algorithm not in SUPPORTED_ALGORITHMS:
+                error = f"Nepodporovaný algoritmus {algorithm!r}; výstup je vypnutý."
+                if item.get('configuration_error') != error:
+                    logger.warning("%s (%s): %s", item.get('name'), item['address'], error)
+                item['configuration_error'] = error
+                output = 0  # Preserve the original fallback without preventing startup.
+            else:
+                item.pop('configuration_error', None)
+                if now is None and algorithm not in STATIC_ALGORITHMS:
+                    output = self._last_outputs.get(item['id'], 0)
+                elif algorithm == 'chodba':
+                    if item['id'] not in self._corridors:
+                        self._corridors[item['id']] = CorridorLighting(
+                            self.corridor_pause_min, self.corridor_pause_max)
+                    output = evaluate_algorithm(algorithm, sunrise, sunset,
+                                                corridor=self._corridors[item['id']], **time_args)
+                else:
+                    output = evaluate_algorithm(algorithm, sunrise, sunset, **time_args)
+            self._last_outputs[item['id']] = output
+            item['is_on'] = output > 0
+            modules.setdefault(module, {})[port] = output
+        return modules

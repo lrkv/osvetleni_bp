@@ -94,5 +94,5 @@ groups:
                 algorithm: "disco"
                 address: "1:14"
           - name: "reflektor"
-            algorithm: "trvale-zapnuto"
+            algorithm: "trvale_zapnuto"
             address: "1:15"

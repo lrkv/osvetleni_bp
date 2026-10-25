@@ -1,26 +1,13 @@
-from fastapi import FastAPI, Request
+import asyncio
+import re
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI()
-
-# Nastavení CORS pro povolení komunikace s frontendem
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.get("/api/structure")
-def get_structure(request: Request):
-    # Přes request.app.state přistoupíme ke správci, kterého nám sem dodá main.py
-    manager = request.app.state.manager
-
-    # Vracíme proměnnou tree_data, kterou si správce drží ve své paměti
-    return manager.tree_data
+from configurate import SUPPORTED_ALGORITHMS, load_settings
+from service import LightingService
 
 
 class UpdateRequest(BaseModel):
@@ -28,20 +15,85 @@ class UpdateRequest(BaseModel):
     new_algorithm: str
 
 
-@app.post("/api/algorithm")
-def update_algorithm(req: UpdateRequest, request: Request):
-    manager = request.app.state.manager
-    daemon = getattr(request.app.state, 'daemon', None)
-    sunrise = getattr(request.app.state, 'sunrise', "05:00")
-    sunset = getattr(request.app.state, 'sunset', "21:00")
+def create_app(settings=None):
+    settings = settings if settings is not None else load_settings()
+    server = settings.get("server", {})
+    origins = server.get("allowed_origins", ["http://localhost:3000", "http://127.0.0.1:3000"])
+    origin_regex = server.get("allowed_origin_regex")
 
-    # Zápis nového algoritmu do vnitřní paměti
-    success = manager.change_algorithm(req.item_id, req.new_algorithm)
+    @asynccontextmanager
+    async def lifespan(app):
+        service = LightingService(settings)
+        app.state.service = service
+        await service.start()
+        try:
+            yield
+        finally:
+            await service.stop()
 
-    # OPRAVA: Metodu pro aktualizaci voláme VŽDY.
-    # Tím se uvnitř vypočítá proměnná 'is_on', díky které se obarví web.
-    # O neodeslání dat do odpojeného hardwaru se postará úprava z kroku 1.
-    if success:
-        manager.update_hardware(daemon, sunrise, sunset)
+    app = FastAPI(lifespan=lifespan)
+    app.add_middleware(
+        CORSMiddleware, allow_origins=origins, allow_origin_regex=origin_regex,
+        allow_credentials=False, allow_methods=["GET", "POST"],
+        allow_headers=["Content-Type"],
+    )
 
-    return {"success": success, "updated_id": req.item_id, "algorithm": req.new_algorithm}
+    @app.get("/api/structure")
+    async def get_structure(request: Request):
+        return request.app.state.service.manager.tree_data
+
+    @app.post("/api/algorithm", status_code=202)
+    async def update_algorithm(req: UpdateRequest, request: Request):
+        service = request.app.state.service
+        if req.new_algorithm not in SUPPORTED_ALGORITHMS:
+            raise HTTPException(422, "Neznámý algoritmus.")
+        if not service.manager.change_algorithm(req.item_id, req.new_algorithm):
+            raise HTTPException(404, "Prvek neexistuje.")
+        service.recalculate()
+        # Accepted into desired state; TCP acknowledgement arrives independently.
+        return {"success": True, "updated_id": req.item_id, "algorithm": req.new_algorithm}
+
+    @app.websocket("/api/ws")
+    async def state_socket(websocket: WebSocket):
+        origin = websocket.headers.get("origin")
+        if origin and not (
+            origin in origins or "*" in origins
+            or (origin_regex and re.fullmatch(origin_regex, origin))
+        ):
+            await websocket.close(code=1008)
+            return
+        await websocket.accept()
+        service = websocket.app.state.service
+        queue = service.subscribe()
+
+        async def send_updates():
+            while True:
+                snapshot = await queue.get()
+                await asyncio.wait_for(websocket.send_text(snapshot), 10)
+
+        async def receive_until_closed():
+            while True:
+                await websocket.receive_text()
+
+        tasks = [asyncio.create_task(send_updates()),
+                 asyncio.create_task(receive_until_closed())]
+        try:
+            done, _ = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            for task in done:
+                task.result()
+        except (WebSocketDisconnect, OSError, TimeoutError, RuntimeError):
+            pass
+        finally:
+            service.subscribers.discard(queue)
+            for task in tasks:
+                task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            try:
+                await websocket.close()
+            except (RuntimeError, OSError):
+                pass
+
+    return app
+
+
+app = create_app()

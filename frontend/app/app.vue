@@ -1,56 +1,91 @@
 <template>
-  <div class="min-h-screen bg-slate-50 font-sans p-4 sm:p-8">
-    <div class="max-w-4xl mx-auto">
-
-      <header class="mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Správa osvětlení kolejiště</h1>
-        <p v-if="pending" class="text-slate-500 mt-2 animate-pulse">Načítám konfiguraci z backendu...</p>
-        <p v-else-if="error" class="text-red-500 mt-2 font-medium">Chyba připojení k API: {{ error.message }}</p>
-      </header>
-
-      <main v-if="data" class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
-
-        <div class="mb-8 pb-6 border-b border-slate-100">
-          <h2 class="text-2xl font-bold text-slate-800">{{ data.layout_name }}</h2>
-          <div class="text-sm text-slate-600 mt-2 flex gap-4">
-            <span>Umístění: <strong>{{ data.location }}</strong></span>
-            <span>Verze YAML: <strong>{{ data.version }}</strong></span>
+  <div class="lighting-app" :data-theme="darkMode ? 'dark' : 'light'" :data-accent="accent">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="layout-heading">
+          <div class="layout-title">{{ data?.layout_name || 'Osvětlení kolejiště' }}</div>
+          <p v-if="data?.location" class="layout-location">{{ data.location }}</p>
+          <p v-if="data?.note" class="layout-note" :title="data.note">{{ data.note }}</p>
+        </div>
+        <div class="clock-panel">
+          <div class="clock-face">
+            <span class="eyebrow">{{ clockType }}</span>
+            <time>{{ clock?.time || '--:--:--' }}</time>
           </div>
-          <p class="text-slate-500 mt-3">{{ data.note }}</p>
+          <div class="clock-meta">
+            <strong>{{ clockSpeed || 'Čekám na čas' }}</strong>
+            <span>{{ clockStatus }}</span>
+          </div>
         </div>
+        <button class="settings-button" @click="toggleSettings" :aria-expanded="settingsOpen" aria-controls="appearance-settings" aria-label="Nastavení vzhledu">⚙ <span>Vzhled</span></button>
+      </div>
+    </header>
 
-        <div class="space-y-6">
-          <RailwayNode
-            v-for="(group, index) in data.groups"
-            :key="index"
-            :node="group"
-          />
+    <div class="page-content">
+      <section v-if="settingsOpen" id="appearance-settings" class="settings-panel" aria-label="Nastavení vzhledu">
+        <div class="section-title"><h2>Nastavení vzhledu</h2><button class="text-button" @click="settingsOpen = false">Zavřít</button></div>
+        <div class="settings-options">
+          <label class="check-option"><input type="checkbox" v-model="darkMode"> Tmavý režim</label>
+          <label class="check-option"><input type="checkbox" v-model="showAddress"> Zobrazit adresy</label>
+          <label class="check-option"><input type="checkbox" v-model="showId"> Zobrazit ID</label>
         </div>
+        <fieldset class="theme-options"><legend>Barevný motiv</legend>
+          <label v-for="theme in themes" :key="theme.value" class="theme-choice">
+            <input type="radio" name="accent" :value="theme.value" v-model="accent">
+            <span class="swatch" :style="{ background: theme.color }"></span>{{ theme.label }}
+          </label>
+        </fieldset>
+        <p class="muted small">Nastavení se ukládá v tomto prohlížeči. Černý motiv používá černé pozadí a bílé doplňky. Žlutá vždy označuje rozsvícená světla.</p>
+      </section>
 
+      <section class="connection-status" aria-label="Stav připojení">
+        <p v-if="pending">Načítám konfiguraci…</p>
+        <p v-if="error" class="error-text" role="alert">{{ error }}</p>
+        <p v-if="clock?.error" class="error-text">hJOP: {{ clock.error }}</p>
+        <p v-if="hardware" role="status">{{ hardwareMessage }}</p>
+        <div v-if="configurationErrors.length" class="error-box" role="alert">
+          <strong>Nepodporované algoritmy – vyberte jiný režim:</strong>
+          <p v-for="issue in configurationErrors" :key="issue.id">{{ issue.name }}: {{ issue.message }}</p>
+        </div>
+      </section>
+
+      <main v-if="data" class="layout-content">
+        <div class="section-title"><h1>Osvětlení</h1><span class="muted small">{{ data.version ? 'Verze ' + data.version : '' }}</span></div>
+        <div class="legend" aria-label="Stavy skupin">
+          <span><i class="status-dot all"></i>Vše svítí</span>
+          <span><i class="status-dot some"></i>Část svítí</span>
+          <span><i class="status-dot none"></i>Vypnuto</span>
+        </div>
+        <p class="muted small legend-note">Barvy ukazují požadovaný stav podle algoritmu.</p>
+        <RailwayNode v-for="group in data.groups" :key="group.id" :node="group" />
       </main>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
-
-const { data, pending, error } = await useFetch('http://127.0.0.1:8000/api/structure', {
-  key: 'kolejiste'
-})
-
-let interval;
-
-// Jakmile se stránka načte, spustíme tiché dotazování na pozadí
-onMounted(() => {
-  interval = setInterval(() => {
-    refreshNuxtData('kolejiste')
-  }, 5000) // 5000 milisekund = 5 vteřin
-})
-
-// Pokud by uživatel odešel jinam, smyčku bezpečně zrušíme
-onUnmounted(() => {
-  clearInterval(interval)
-})
+import { provide, ref, nextTick } from 'vue'
+import './assets/lighting.css'
+const lighting = useLighting()
+const { data, pending, error, hardware, hardwareMessage, configurationErrors, clock, clockType, clockSpeed, clockStatus } = lighting
+const appearance = useAppearance()
+const { darkMode, accent, showAddress, showId } = appearance
+const settingsOpen = ref(false)
+async function toggleSettings() {
+  settingsOpen.value = !settingsOpen.value
+  if (settingsOpen.value) {
+    await nextTick()
+    document.getElementById('appearance-settings')?.scrollIntoView({ block: 'start' })
+  }
+}
+const themes = [
+  { value: 'yellow', label: 'Žlutý', color: '#fffa4b' },
+  { value: 'green', label: 'Zelený', color: '#36f608' },
+  { value: 'blue', label: 'Modrý', color: '#0871f4' },
+  { value: 'red', label: 'Červený', color: '#cd0f0f' },
+  { value: 'black', label: 'Černý', color: '#111111' },
+  { value: 'cyan', label: 'Cyan', color: '#00FFFF' },
+]
+provide('lighting', lighting)
+provide('appearance', appearance)
 </script>

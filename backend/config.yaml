@@ -1,4 +1,98 @@
+# ============================================================================
+# KONFIGURACE OSVĚTLENÍ KOLEJIŠTĚ
+# ============================================================================
+# Po změně tohoto souboru restartujte backend.
+# Řádky začínající # jsou komentáře, aplikace je nečte.
+# Zachovejte názvy klíčů a odsazení mezerami; nepoužívejte tabulátory.
+# Časové limity a prodlevy níže jsou vždy ve skutečných sekundách.
+# Adresa backendu pro prohlížeč se nastavuje samostatně ve frontendu:
+# frontend/public/backend-config.json (backendUrl a backendPort).
+
+# --- Osvětlení a časové rozvrhy -----------------------------------------------
 light:
+  # Východ a západ slunce ve formátu H:MM nebo HH:MM. Hodnotu ponechte v uvozovkách.
   sunrise: "5:32"
   sunset: "20:09"
-configurate: "lrkv_tt.yaml"
+  # Nastavení algoritmu chodba (název odpovídá existujícímu identifikátoru).
+  chodba:
+    # Nejkratší náhodná pauza před rozsvícením: 60 sekund = 1 minuta.
+    pause_min_seconds: 60
+    # Nejdelší náhodná pauza: 300 sekund = 5 minut; nesmí být menší než minimum.
+    # Obě hodnoty musí být kladné. Pauza i rozsvícení používají skutečné sekundy,
+    # nezrychlují se s hJOP. Doba rozsvícení 20–30 sekund je součástí algoritmu.
+    pause_max_seconds: 300
+
+# --- Výběr kolejiště ----------------------------------------------------------
+# Název souboru se strukturou světel ze složky backend/configurate/.
+# Vyberte pouze jednu aktivní hodnotu; ostatní příklady nechte zakomentované.
+# Adresa světla v tomto souboru má klíč address a formát "modul:výstup".
+#configurate: "lrkv_tt.yaml"
+#configurate: "railway00.yaml"
+configurate: "vystava_test.yaml"
+#configurate: "vystava.yaml"
+
+# --- Webový server backendu (HTTP API a WebSocket) -----------------------------
+server:
+  # Na kterém síťovém rozhraní backend naslouchá:
+  # "0.0.0.0" = všechna IPv4 rozhraní, umožňuje přístup z LAN.
+  # "127.0.0.1" = jen tento počítač, z jiného zařízení se nepřipojíte.
+  # Do prohlížeče zadávejte skutečnou IP počítače, nikoli 0.0.0.0.
+  host: "0.0.0.0"
+  # Port backendu pro HTTP i WebSocket. Musí odpovídat nastavení frontendu
+  # a být dostupný ve firewallu. Port frontendu se nastavuje zvlášť.
+  port: 8000
+  # Povolené adresy FRONTENDU, ze kterých prohlížeč smí oslovit backend.
+  # Uvádí se protokol + hostname/IP + port, bez cesty a bez koncového lomítka.
+  # Například "http://kolejiste.local:3000" nebo "http://192.168.1.20:3000".
+  # Nejde o adresy MTB/hJOP ani o přihlašování uživatelů.
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+  # Další povolené adresy frontendů ve formě regulárního výrazu.
+  # Tento výraz povoluje localhost a privátní IPv4 rozsahy:
+  # 10.x.x.x, 192.168.x.x a 172.16.x.x až 172.31.x.x, s libovolným portem.
+  # Pro DNS jméno nebo IPv6 přidejte přesnou adresu do allowed_origins výše.
+  # Povolení platí, pokud adresa odpovídá seznamu NEBO tomuto výrazu.
+  allowed_origin_regex: 'https?://(localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?'
+
+# --- MTB Daemon: spojení s hardwarem ------------------------------------------
+mtb:
+  # IP nebo hostname počítače s MTB démonem, z pohledu backendu.
+  # "127.0.0.1" = stejný počítač jako backend; pro jiný server zadejte jeho IP.
+  host: "127.0.0.1"
+  # TCP port MTB démona; musí odpovídat jeho nastavení.
+  port: 3841
+  # Maximální čekání na připojení, odeslání nebo potvrzení příkazu (sekundy).
+  # Čekání je asynchronní, aplikaci neblokuje. Při timeoutu obnoví spojení.
+  timeout: 5
+  # Prodleva před opakováním připojení nebo příkazu odmítnutého modulem.
+  reconnect_delay: 3
+
+# --- hJOP: zdroj modelového času ----------------------------------------------
+hjop:
+  # true = čas z hJOP; false = místní reálný čas počítače s backendem (1×).
+  # Při výpadku hJOP se automaticky nepřepíná na reálný čas:
+  # poslední čas se zastaví a web zobrazí odpojení.
+  enabled: true
+  # IP nebo hostname serveru hJOP, z pohledu backendu, nikoli prohlížeče.
+  # "localhost" = hJOP a backend běží na stejném počítači.
+  # Pro hJOP na jiném zařízení použijte například "192.168.1.30".
+  # Tato hodnota přepisuje záložní hodnotu konstruktoru v hjop.py.
+  host: "localhost"
+  # TCP port PANELOVÉHO serveru hJOP (nejde o HTTP adresu).
+  # Nastavení zde přepisuje záložní port v hjop.py.
+  port: 5896
+  # Limit připojení, odeslání a počáteční synchronizace času (sekundy).
+  timeout: 5
+  # Za jak dlouho po výpadku zkusit znovu navázat spojení (sekundy).
+  reconnect_delay: 3
+  # Nejdelší čekání na další úplnou zprávu ze serveru (sekundy).
+  # Počítají se i udržovací zprávy PING; při překročení se spojení obnoví.
+  idle_timeout: 20
+  # Nejdelší interval bez nové synchronizace modelového času (sekundy).
+  # PING tento interval neobnovuje. Hodnota má být delší než interval
+  # synchronizací hJOP; po překročení se spojení obnoví.
+  sync_timeout: 240
+  # Rychlost a běh/pauza se přebírají z hJOP, nenastavují se zde.
+  # Mezi synchronizacemi backend čas dopočítává podle násobitele hJOP.
+  # Web dostává změněný čas přes WebSocket přibližně jednou za skutečnou sekundu.

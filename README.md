@@ -152,7 +152,8 @@ npm run build
   aktivaci v noci také následuje po náhodné pauze. Při východu slunce zhasne
   i případné probíhající rozsvícení. Pauzy lze změnit v `corridor.pause_min_seconds`
   a `corridor.pause_max_seconds` v `backend/configurate/algorithms.yaml` (výchozí 60 a 300).
-- `prodejna`: svítí od 07:00 včetně do 19:00; v 19:00 už je vypnutá.
+- `prodejna`: svítí od `shop.opening_time` včetně do `shop.closing_time`
+  v `backend/configurate/algorithms.yaml` (výchozí 07:00–19:00). Podporuje i interval přes půlnoc.
 - `vyloha`: svítí nepřetržitě, také v noci.
 
 Východ a západ se berou z `sunrise` a `sunset`. Časové rozvrhy používají

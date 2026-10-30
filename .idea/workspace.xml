@@ -4,20 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="úprava načítání času">
+    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="každý algoritmus je zvlášť soubor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NASAZENI.md" beforeDir="false" afterPath="$PROJECT_DIR$/NASAZENI.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/algorithm/shop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithm/shop.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/configurate.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/configurate/algorithms.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate/algorithms.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_building_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_building_algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_hjop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_hjop.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_household.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_household.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -274,7 +267,7 @@
       <workItem from="1792009010624" duration="1744000" />
       <workItem from="1792848887295" duration="14076000" />
       <workItem from="1792963693465" duration="1272000" />
-      <workItem from="1792971248047" duration="19677000" />
+      <workItem from="1792971248047" duration="21271000" />
     </task>
     <task id="LOCAL-00001" summary="úvodní nástřel">
       <option name="closed" value="true" />
@@ -420,7 +413,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793361083890</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="každý algoritmus je zvlášť soubor">
+      <option name="closed" value="true" />
+      <created>1793364838383</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1793364838383</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -441,7 +442,8 @@
     <MESSAGE value="oprava" />
     <MESSAGE value="Web má 3 zobrazení, algoritmus domácnosti funguje." />
     <MESSAGE value="úprava načítání času" />
-    <option name="LAST_COMMIT_MESSAGE" value="úprava načítání času" />
+    <MESSAGE value="každý algoritmus je zvlášť soubor" />
+    <option name="LAST_COMMIT_MESSAGE" value="každý algoritmus je zvlášť soubor" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/osvetleni_bp$mapa.coverage" NAME="mapa Coverage Results" MODIFIED="1778502313293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />

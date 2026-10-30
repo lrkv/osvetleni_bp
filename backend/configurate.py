@@ -4,7 +4,7 @@ from datetime import datetime
 
 import yaml
 from functools import partial
-from algorithm import ALGORITHMS, CorridorLighting, HouseholdLighting
+from algorithm import ALGORITHMS, CorridorLighting, HouseholdLighting, Shop
 
 logger = logging.getLogger(__name__)
 
@@ -51,14 +51,17 @@ def load_configuration(file_source=None):
 class ConfigManager:
     def __init__(self, corridor_pause_min=60, corridor_pause_max=300, *,
                  corridor_min_on_seconds=20, corridor_max_on_seconds=30,
-                 household_min_on_seconds=30, household_max_on_seconds=300, household_min_off_seconds=30, household_schedule=None):
+                 household_min_on_seconds=30, household_max_on_seconds=300, household_min_off_seconds=30, household_schedule=None,
+                 shop_opening_time="07:00", shop_closing_time="19:00"):
         # Validate once, before any background task is started.
         CorridorLighting(corridor_pause_min, corridor_pause_max, corridor_min_on_seconds, corridor_max_on_seconds)
         self.corridor_min_on_seconds = corridor_min_on_seconds
         self.corridor_max_on_seconds = corridor_max_on_seconds
         self.corridor_pause_min = corridor_pause_min
         self.corridor_pause_max = corridor_pause_max
+        Shop(shop_opening_time, shop_closing_time)
         self._factories = dict(ALGORITHMS)
+        self._factories[Shop.identifier] = partial(Shop, shop_opening_time, shop_closing_time)
         self._factories[CorridorLighting.identifier] = partial(
             CorridorLighting, corridor_pause_min, corridor_pause_max,
             corridor_min_on_seconds, corridor_max_on_seconds)

@@ -45,6 +45,7 @@ class LightingService:
     def __init__(self, settings):
         corridor = settings["light"].get("corridor", {})
         household = settings["light"].get("household", {})
+        shop = settings["light"].get("shop", {})
         self.manager = ConfigManager(
             corridor_pause_min=corridor.get("pause_min_seconds", 60),
             corridor_pause_max=corridor.get("pause_max_seconds", 300),
@@ -54,6 +55,8 @@ class LightingService:
             household_max_on_seconds=household.get("max_on_seconds", 300),
             household_min_off_seconds=household.get("min_off_seconds", 30),
             household_schedule=household.get("schedule"),
+            shop_opening_time=shop.get("opening_time", "07:00"),
+            shop_closing_time=shop.get("closing_time", "19:00"),
         )
         self.manager.load_yaml(BASE_DIR / "configurate" / settings["configurate"])
         self.sunrise = str(settings["light"]["sunrise"])

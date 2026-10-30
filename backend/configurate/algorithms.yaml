@@ -1,6 +1,10 @@
 # Po změně restartujte backend. Časy rozvrhů používají čas hJOP, je-li zapnutý.
 sunrise: "5:32"
 sunset: "20:09"
+# Prodejna: denní čas rozsvícení a zhasnutí.
+shop:
+  opening_time: "07:00"
+  closing_time: "19:00"
 # Chodba: délka svícení a náhodné pauzy ve skutečných sekundách.
 corridor:
   min_on_seconds: 20

@@ -285,3 +285,39 @@ Algoritmus `minuta` (na webu „Minuta“) svítí v liché minutě a zhasíná 
 času kolejiště, včetně přechodu 23:59 → 00:00. Události ukazují jeho dvě nejbližší změny.
 Současné události sdílejí jeden odpočet a světla se řadí vedle sebe. U skutečných
 časovačů se čas hJOP odhaduje podle aktuální rychlosti; při pozastavení není předpovídán.
+
+
+## Struktura algoritmů
+
+Každý algoritmus má vlastní soubor a třídu ve složce `backend/algorithm/`.
+Společným abstraktním předkem je `Algorithm` v `base.py`:
+
+- `identifier` je původní označení v YAML a API, například `drazni_osvetleni`.
+- `name() -> str` vrací název pro web. Název upravujte přímo v dané třídě.
+- `compute(now, sunrise, sunset, *, item_id=None) -> int` vypočítá výstup MTB.
+- `forecast(...)` vrací budoucí události bez změny časovačů nebo losování.
+- `prepare(item_ids, now)` připraví společný stav před výpočtem jednotlivých světel.
+
+Časově plánované algoritmy dědí z `ScheduledAlgorithm`, který je potomkem
+`Algorithm` a poskytuje společnou předpověď přechodů. Konkrétní časy přechodů
+jsou definované v třídách jednotlivých algoritmů.
+
+| Soubor | Třída | Identifikátor |
+|---|---|---|
+| `always_on.py` | `AlwaysOn` | `trvale_zapnuto` |
+| `always_off.py` | `AlwaysOff` | `trvale_vypnuto` |
+| `household.py` | `HouseholdLighting` | `domacnost` |
+| `street_lamp.py` | `StreetLamp` | `poulicni_lampa` |
+| `railway_lighting.py` | `RailwayLighting` | `drazni_osvetleni` |
+| `corridor.py` | `CorridorLighting` | `chodba` |
+| `shop.py` | `Shop` | `prodejna` |
+| `shop_window.py` | `ShopWindow` | `vyloha` |
+| `disco.py` | `Disco` | `disco` |
+| `minute.py` | `Minute` | `minuta` |
+
+Registr tříd je v `backend/algorithm/__init__.py`; názvy pro web se z něj odvozují
+voláním `name()`. Novou třídu přidejte do `ALGORITHM_CLASSES`.
+Domácnosti používají jednu společnou instanci (`shared = True`), aby se podíl
+počítal přes všechna světla. Chodby mají každá svou instanci a časovač.
+`backend/algorithms.py` slouží pouze jako kompatibilní rozhraní pro starší volání;
+vlastní pravidla jsou ve třídách.

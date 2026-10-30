@@ -3,15 +3,15 @@ from pathlib import Path
 from datetime import datetime
 
 import yaml
-from algorithms import ALGORITHM_LABELS, CorridorLighting, HouseholdLighting, evaluate_algorithm
+from functools import partial
+from algorithm import ALGORITHMS, CorridorLighting, HouseholdLighting
 
 logger = logging.getLogger(__name__)
 
 SYSTEM_TIME = object()
-STATIC_ALGORITHMS = {"trvale_zapnuto", "trvale_vypnuto", "vyloha", "disco"}
 
 BASE_DIR = Path(__file__).resolve().parent
-SUPPORTED_ALGORITHMS = tuple(ALGORITHM_LABELS)
+SUPPORTED_ALGORITHMS = tuple(ALGORITHMS)
 
 
 def load_settings(file_source=None):
@@ -58,9 +58,16 @@ class ConfigManager:
         self.corridor_max_on_seconds = corridor_max_on_seconds
         self.corridor_pause_min = corridor_pause_min
         self.corridor_pause_max = corridor_pause_max
-        self._households = HouseholdLighting(household_min_on_seconds, household_max_on_seconds,
-                                             household_min_off_seconds, schedule=household_schedule)
-        self._corridors = {}
+        self._factories = dict(ALGORITHMS)
+        self._factories[CorridorLighting.identifier] = partial(
+            CorridorLighting, corridor_pause_min, corridor_pause_max,
+            corridor_min_on_seconds, corridor_max_on_seconds)
+        self._factories[HouseholdLighting.identifier] = partial(
+            HouseholdLighting, household_min_on_seconds, household_max_on_seconds,
+            household_min_off_seconds, schedule=household_schedule)
+        self._shared = {key: self._factories[key]() for key, cls in ALGORITHMS.items() if cls.shared}
+        self._households = self._shared[HouseholdLighting.identifier]
+        self._instances = {}
         self._last_outputs = {}
         self.tree_data = {}             # Stromová struktura pro web
         self.items_by_id = {}           # Plochý slovník pro rychlé hledání prvků podle ID
@@ -72,8 +79,9 @@ class ConfigManager:
         return current_id
 
     def load_yaml(self, file_path='railway00.yaml'):
-        self._corridors.clear()
-        self._households.reset()
+        self._instances.clear()
+        for instance in self._shared.values():
+            instance.reset()
         self._last_outputs.clear()
         self.items_by_id.clear()
         self.next_id = 1
@@ -151,8 +159,9 @@ class ConfigManager:
         # Pokud má prvek adresu, jedná se o koncové světlo -> změníme algoritmus
         if 'address' in item:
             if item.get('algorithm') != new_algorithm:
-                self._corridors.pop(item['id'], None)
-                self._households.forget(item['id'])
+                self._instances.pop(item['id'], None)
+                for instance in self._shared.values():
+                    instance.forget(item['id'])
             item['algorithm'] = new_algorithm
 
         # Pokud má prvek vnořené položky (je to skupina), propíšeme změnu i do nich
@@ -160,42 +169,50 @@ class ConfigManager:
             for child in item['items']:
                 self._apply_algorithm(child, new_algorithm)
 
+    @property
+    def _corridors(self):
+        # Compatibility view for tools inspecting corridor timers.
+        return {key: value for key, value in self._instances.items()
+                if isinstance(value, CorridorLighting)}
+
+    def algorithm_for(self, item):
+        identifier = item.get('algorithm')
+        if identifier not in self._factories:
+            return None
+        instance = self._instances.get(item['id'])
+        if instance is None or instance.identifier != identifier:
+            instance = self._shared.get(identifier)
+            if instance is None:
+                instance = self._factories[identifier]()
+            self._instances[item['id']] = instance
+        return instance
+
     def calculate_outputs(self, sunrise: str, sunset: str, *, now=SYSTEM_TIME):
-        """Compute desired states without any network I/O."""
+        """Dispatch through the common algorithm interface without network I/O."""
+        now = datetime.now() if now is SYSTEM_TIME else now
         modules = {}
-        household_ids = [item['id'] for item in self.items_by_id.values()
-                         if 'address' in item and item.get('algorithm') == 'domacnost']
-        household_outputs = self._households.evaluate(
-            household_ids, datetime.now() if now is SYSTEM_TIME else now)
-        time_args = {} if now is SYSTEM_TIME else {"now": now}
+        for identifier, instance in self._shared.items():
+            members = [item['id'] for item in self.items_by_id.values()
+                       if 'address' in item and item.get('algorithm') == identifier]
+            instance.prepare(members, now)
         for item in self.items_by_id.values():
             if 'address' not in item:
                 continue
             module, port = map(int, item['address'].split(':'))
-            algorithm = item.get('algorithm')
-            if algorithm != 'chodba':
-                self._corridors.pop(item['id'], None)
-            if algorithm not in SUPPORTED_ALGORITHMS:
-                error = f"Nepodporovaný algoritmus {algorithm!r}; výstup je vypnutý."
+            instance = self.algorithm_for(item)
+            if instance is None:
+                error = f"Nepodporovaný algoritmus {item.get('algorithm')!r}; výstup je vypnutý."
                 if item.get('configuration_error') != error:
                     logger.warning("%s (%s): %s", item.get('name'), item['address'], error)
                 item['configuration_error'] = error
-                output = 0  # Preserve the original fallback without preventing startup.
+                self._instances.pop(item['id'], None)
+                output = 0
             else:
                 item.pop('configuration_error', None)
-                if algorithm == 'domacnost':
-                    output = evaluate_algorithm(algorithm, household_output=household_outputs[item['id']])
-                elif now is None and algorithm not in STATIC_ALGORITHMS:
+                if now is None and instance.time_required:
                     output = self._last_outputs.get(item['id'], 0)
-                elif algorithm == 'chodba':
-                    if item['id'] not in self._corridors:
-                        self._corridors[item['id']] = CorridorLighting(
-                            self.corridor_pause_min, self.corridor_pause_max,
-                            self.corridor_min_on_seconds, self.corridor_max_on_seconds)
-                    output = evaluate_algorithm(algorithm, sunrise, sunset,
-                                                corridor=self._corridors[item['id']], **time_args)
                 else:
-                    output = evaluate_algorithm(algorithm, sunrise, sunset, **time_args)
+                    output = instance.compute(now, sunrise, sunset, item_id=item['id'])
             self._last_outputs[item['id']] = output
             item['is_on'] = output > 0
             modules.setdefault(module, {})[port] = output

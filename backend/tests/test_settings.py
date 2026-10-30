@@ -18,12 +18,13 @@ class SettingsTests(unittest.TestCase):
             (root / "layout.yaml").write_text('groups: [{name: Hall, address: "1:0", algorithm: chodba}]', encoding="utf-8")
             (root / "timing.yaml").write_text('sunrise: "06:00"\nsunset: "20:00"\ncorridor: {pause_min_seconds: 1, pause_max_seconds: 1, min_on_seconds: 42, max_on_seconds: 42}', encoding="utf-8")
             settings = load_settings(root / "config.yaml")
-            self.assertEqual(Path(settings["configurate"]), root / "layout.yaml")
+            # Windows may return either the short (8.3) or full form of a path.
+            self.assertTrue(Path(settings["configurate"]).samefile(root / "layout.yaml"))
             service = LightingService(settings)
             now = datetime(2026, 10, 29, 22)
-            with patch("algorithms.monotonic", return_value=0):
+            with patch("algorithm.corridor.monotonic", return_value=0):
                 service.manager.calculate_outputs(service.sunrise, service.sunset, now=now)
-            with patch("algorithms.monotonic", return_value=1):
+            with patch("algorithm.corridor.monotonic", return_value=1):
                 service.manager.calculate_outputs(service.sunrise, service.sunset, now=now)
             corridor = service.manager._corridors[1]
             self.assertTrue(corridor.is_on)

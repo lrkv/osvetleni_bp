@@ -41,12 +41,12 @@ class BuildingAlgorithmsTests(unittest.TestCase):
 
 class CorridorTests(unittest.TestCase):
     def evaluate(self, state, elapsed, instant="2026-10-25T22:00:00"):
-        with patch("algorithms.monotonic", return_value=elapsed):
+        with patch("algorithm.corridor.monotonic", return_value=elapsed):
             return state.evaluate(datetime.fromisoformat(instant), "5:32", "20:09")
 
     def test_random_intervals_are_stable_between_recalculations(self):
         state = CorridorLighting()
-        with patch("algorithms.random.randint", side_effect=[60, 20, 300, 30, 60]) as rng:
+        with patch("algorithm.corridor.random.randint", side_effect=[60, 20, 300, 30, 60]) as rng:
             self.assertEqual(self.evaluate(state, 0), 0)
             self.assertEqual(self.evaluate(state, 59.99), 0)
             self.assertEqual(rng.call_count, 1)
@@ -62,7 +62,7 @@ class CorridorTests(unittest.TestCase):
 
     def test_dawn_cuts_off_light_and_new_night_starts_new_schedule(self):
         state = CorridorLighting()
-        with patch("algorithms.random.randint", side_effect=[60, 30, 120]) as rng:
+        with patch("algorithm.corridor.random.randint", side_effect=[60, 30, 120]) as rng:
             self.assertEqual(self.evaluate(state, 0), 0)
             self.assertEqual(self.evaluate(state, 60, "2026-10-26T05:31:59"), 1)
             self.assertEqual(self.evaluate(state, 61, "2026-10-26T05:32:00"), 0)
@@ -74,14 +74,14 @@ class CorridorTests(unittest.TestCase):
 
     def test_midnight_does_not_reset_light(self):
         state = CorridorLighting()
-        with patch("algorithms.random.randint", side_effect=[60, 30]) as rng:
+        with patch("algorithm.corridor.random.randint", side_effect=[60, 30]) as rng:
             self.evaluate(state, 0, "2026-10-25T23:58:55")
             self.assertEqual(self.evaluate(state, 60, "2026-10-25T23:59:55"), 1)
             self.assertEqual(self.evaluate(state, 65, "2026-10-26T00:00:00"), 1)
             self.assertEqual(rng.call_count, 2)
 
     def test_daytime_never_draws_random_numbers(self):
-        with patch("algorithms.random.randint") as rng:
+        with patch("algorithm.corridor.random.randint") as rng:
             self.assertEqual(self.evaluate(CorridorLighting(), 0, "2026-10-25T12:00:00"), 0)
             self.assertEqual(self.evaluate(CorridorLighting(), 0, "2026-10-25T20:08:59"), 0)
             rng.assert_not_called()
@@ -92,9 +92,9 @@ class CorridorTests(unittest.TestCase):
             1: {"id": 1, "name": "A", "address": "1:0", "algorithm": "chodba"},
             2: {"id": 2, "name": "B", "address": "1:1", "algorithm": "chodba"},
         }
-        with patch("algorithms.datetime", wraps=datetime) as clock, \
-             patch("algorithms.monotonic", return_value=0) as elapsed, \
-             patch("algorithms.random.randint", side_effect=[60, 120, 20, 180]):
+        with patch("configurate.datetime", wraps=datetime) as clock, \
+             patch("algorithm.corridor.monotonic", return_value=0) as elapsed, \
+             patch("algorithm.corridor.random.randint", side_effect=[60, 120, 20, 180]):
             clock.now.return_value = datetime(2026, 10, 25, 22)
             self.assertEqual(manager.calculate_outputs("5:32", "20:09"), {1: {0: 0, 1: 0}})
             elapsed.return_value = 60

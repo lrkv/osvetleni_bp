@@ -6,7 +6,7 @@ from datetime import datetime
 from configurate import BASE_DIR, ConfigManager, SUPPORTED_ALGORITHMS
 from mtb import DaemonClient
 from hjop import HjopClock
-from algorithms import ALGORITHM_LABELS
+from algorithm import ALGORITHM_LABELS
 from events import upcoming_events
 
 logger = logging.getLogger(__name__)

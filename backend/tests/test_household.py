@@ -19,7 +19,7 @@ def instant(time):
 
 
 def evaluate(controller, elapsed, time="19:00:00", members=range(10)):
-    with patch("algorithms.monotonic", return_value=elapsed):
+    with patch("algorithm.household.monotonic", return_value=elapsed):
         return controller.evaluate(members, instant(time) if time else None)
 
 
@@ -51,7 +51,7 @@ class HouseholdTests(unittest.TestCase):
 
     def test_minimum_survives_model_time_jump_and_maximum_uses_real_time(self):
         controller = HouseholdLighting()
-        with patch("algorithms.random.uniform", return_value=300):
+        with patch("algorithm.household.random.uniform", return_value=300):
             initial = evaluate(controller, 0)
             self.assertEqual(sum(initial.values()), 7)
             # Model time jumps into daytime; real on-period is still shorter than 30 s.
@@ -78,7 +78,7 @@ class HouseholdTests(unittest.TestCase):
 
     def test_random_duration_is_drawn_once_per_on_period(self):
         controller = HouseholdLighting(45, 90, 30)
-        with patch("algorithms.random.uniform", return_value=60) as rng:
+        with patch("algorithm.household.random.uniform", return_value=60) as rng:
             first = evaluate(controller, 0)
             self.assertEqual(rng.call_count, 7)
             for elapsed in (0, 1, 20, 44, 59):
@@ -91,7 +91,7 @@ class HouseholdTests(unittest.TestCase):
     def test_no_clock_and_membership_changes(self):
         controller = HouseholdLighting()
         self.assertEqual(sum(evaluate(controller, 0, time=None).values()), 0)
-        with patch("algorithms.random.uniform", return_value=300):
+        with patch("algorithm.household.random.uniform", return_value=300):
             first = evaluate(controller, 1)
             on_id = next(key for key, value in first.items() if value)
             changed = evaluate(controller, 2, members=[key for key in range(10) if key != on_id])
@@ -114,8 +114,8 @@ class HouseholdTests(unittest.TestCase):
         last = dict.fromkeys(range(20), 0)
         changed_at = dict.fromkeys(range(20), -1000)
         seen_on = set()
-        with patch("algorithms.random.uniform", side_effect=rng.uniform), \
-             patch("algorithms.random.shuffle", side_effect=rng.shuffle):
+        with patch("algorithm.household.random.uniform", side_effect=rng.uniform), \
+             patch("algorithm.household.random.shuffle", side_effect=rng.shuffle):
             for elapsed in range(1801):
                 state = evaluate(controller, elapsed, members=range(20))
                 for key, value in state.items():
@@ -155,12 +155,12 @@ class HouseholdIntegrationTests(unittest.TestCase):
         self.assertEqual(manager._households.min_on_seconds, 45)
         self.assertEqual(manager._households.max_on_seconds, 90)
         self.assertEqual(manager._households.min_off_seconds, 35)
-        with patch("service.datetime") as system_time, patch("algorithms.monotonic", return_value=0):
+        with patch("service.datetime") as system_time, patch("algorithm.household.monotonic", return_value=0):
             system_time.now.return_value = instant("12:00:00")
             service.recalculate()
         self.assertEqual(sum(sum(ports.values()) for ports in service.daemon.desired.values()), 1)
         service.model_clock.connected = True
-        with patch("algorithms.monotonic", return_value=0), patch("hjop.monotonic", return_value=0):
+        with patch("algorithm.household.monotonic", return_value=0), patch("hjop.monotonic", return_value=0):
             service.model_clock.apply_time("-;MOD-CAS;0;9;19:00:00;1".split(";"))
             self.assertEqual(sum(sum(ports.values()) for ports in service.daemon.desired.values()), 14)
         snapshot = json.loads(service.snapshot)
@@ -172,7 +172,7 @@ class HouseholdIntegrationTests(unittest.TestCase):
         manager = ConfigManager()
         for index in range(10):
             manager._process_item({"name": str(index), "address": f"1:{index}", "algorithm": "domacnost"})
-        with patch("algorithms.monotonic", return_value=0), patch("algorithms.random.uniform", return_value=300):
+        with patch("algorithm.household.monotonic", return_value=0), patch("algorithm.household.random.uniform", return_value=300):
             manager.calculate_outputs("5:32", "20:09", now=instant("19:00:00"))
             light = next(item for item in manager.items_by_id.values() if item["is_on"])
             previous = manager._households._states[light["id"]]
@@ -250,7 +250,7 @@ class ConfigurableScheduleTests(unittest.TestCase):
         for index in range(20):
             service.manager._process_item({"name": str(index), "address": f"{index // 16 + 1}:{index % 16}", "algorithm": "domacnost"})
         service.model_clock.connected = True
-        with patch("algorithms.monotonic", return_value=0), patch("hjop.monotonic", return_value=0):
+        with patch("algorithm.household.monotonic", return_value=0), patch("hjop.monotonic", return_value=0):
             service.model_clock.apply_time("-;MOD-CAS;0;9;19:00:00;1".split(";"))
         self.assertEqual(sum(sum(ports.values()) for ports in service.daemon.desired.values()), 5)
         settings["light"]["household"]["schedule"] = []

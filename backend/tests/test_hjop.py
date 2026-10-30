@@ -162,8 +162,8 @@ class ClockTests(unittest.TestCase):
         }
         service.model_clock.connected = True
         with patch("hjop.monotonic", return_value=0) as model_timer, \
-             patch("algorithms.monotonic", return_value=0) as real_timer, \
-             patch("algorithms.random.randint", side_effect=[60, 20, 60]):
+             patch("algorithm.corridor.monotonic", return_value=0) as real_timer, \
+             patch("algorithm.corridor.random.randint", side_effect=[60, 20, 60]):
             service.model_clock.apply_time("-;MOD-CAS;1;9;22:00:00;1".split(";"))
             real_timer.return_value = model_timer.return_value = 59
             service.recalculate()

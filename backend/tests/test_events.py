@@ -37,7 +37,7 @@ class EventTests(unittest.TestCase):
         manager = self.manager(["prodejna", "chodba", "domacnost", "domacnost", "vyloha"])
         corridor = CorridorLighting()
         corridor.deadline = 110
-        manager._corridors[2] = corridor
+        manager._instances[2] = corridor
         manager._households._states[3] = _HouseholdState(on_since=90, deadline=120)
         rng = random.getstate()
         with patch("events.monotonic", return_value=100):
@@ -63,7 +63,7 @@ class EventTests(unittest.TestCase):
         manager = self.manager(["chodba"])
         corridor = CorridorLighting()
         corridor.deadline = 130
-        manager._corridors[1] = corridor
+        manager._instances[1] = corridor
         now = NOW.replace(hour=5, minute=59)
         with patch("events.monotonic", return_value=100):
             forecast = upcoming_events(manager, "6:00", "20:00", now, STATUS, NOW)
@@ -105,7 +105,7 @@ class EventTests(unittest.TestCase):
         manager = self.manager(["chodba", "minuta", "minuta"])
         corridor = CorridorLighting()
         corridor.deadline = 110
-        manager._corridors[1] = corridor
+        manager._instances[1] = corridor
         with patch("events.monotonic", return_value=100):
             forecast = upcoming_events(manager, "6:00", "20:00", NOW, STATUS, NOW)
             corridor_row = next(row for row in forecast["events"] if row["id"] == 1)

@@ -67,7 +67,7 @@ class RailwayLightingTests(unittest.TestCase):
         on = parse_time_to_datetime(sunset, today) + timedelta(minutes=15)
         off = parse_time_to_datetime(sunrise, today) - timedelta(minutes=15)
         for instant, expected in ((on, 1), (off, 0)):
-            with patch("algorithms.datetime", wraps=datetime) as clock:
+            with patch("configurate.datetime", wraps=datetime) as clock:
                 clock.now.return_value = instant
                 self.assertEqual(manager.calculate_outputs(sunrise, sunset)[1][2], expected)
                 self.assertEqual(item["is_on"], bool(expected))

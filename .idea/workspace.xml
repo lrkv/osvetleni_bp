@@ -4,25 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="oprava">
+    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="úprava načítání času">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NASAZENI.md" beforeDir="false" afterPath="$PROJECT_DIR$/NASAZENI.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/config.yaml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/configurate.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/configurate/railway.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate/railway.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/configurate/vystava.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate/vystava.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/configurate/vystava_test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate/vystava_test.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/hjop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/hjop.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/events.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_algorithms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/tests/test_building_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_building_algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/app.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/app.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/assets/lighting.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/assets/lighting.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/components/RailwayNode.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/components/RailwayNode.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/composables/useAppearance.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/composables/useAppearance.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app/composables/useLighting.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/composables/useLighting.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/nuxt.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/nuxt.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tests/lighting.test.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tests/lighting.test.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_hjop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_hjop.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_household.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_household.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/test_settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,9 +234,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main (2)" />
+        <item itemvalue="Python tests.Python tests in tests" />
         <item itemvalue="npm.dev" />
         <item itemvalue="Python.test" />
-        <item itemvalue="Python tests.Python tests in tests" />
         <item itemvalue="Python tests.Python tests in test_algorithms.py" />
       </list>
     </recent_temporary>
@@ -279,7 +274,7 @@
       <workItem from="1792009010624" duration="1744000" />
       <workItem from="1792848887295" duration="14076000" />
       <workItem from="1792963693465" duration="1272000" />
-      <workItem from="1792971248047" duration="15104000" />
+      <workItem from="1792971248047" duration="19677000" />
     </task>
     <task id="LOCAL-00001" summary="úvodní nástřel">
       <option name="closed" value="true" />
@@ -409,7 +404,23 @@
       <option name="project" value="LOCAL" />
       <updated>1792902106532</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Web má 3 zobrazení, algoritmus domácnosti funguje.">
+      <option name="closed" value="true" />
+      <created>1793359613675</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1793359613675</updated>
+    </task>
+    <task id="LOCAL-00018" summary="úprava načítání času">
+      <option name="closed" value="true" />
+      <created>1793361083890</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1793361083890</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -428,7 +439,9 @@
     <MESSAGE value="přidání konfigurace LRKV, oprava na anglické názvy" />
     <MESSAGE value="oprava pomocí Codexu" />
     <MESSAGE value="oprava" />
-    <option name="LAST_COMMIT_MESSAGE" value="oprava" />
+    <MESSAGE value="Web má 3 zobrazení, algoritmus domácnosti funguje." />
+    <MESSAGE value="úprava načítání času" />
+    <option name="LAST_COMMIT_MESSAGE" value="úprava načítání času" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/osvetleni_bp$mapa.coverage" NAME="mapa Coverage Results" MODIFIED="1778502313293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
@@ -436,9 +449,9 @@
     <SUITE FILE_PATH="coverage/osvetleni_bp$mainy.coverage" NAME="mainy Coverage Results" MODIFIED="1775817116383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$zk.coverage" NAME="zk Coverage Results" MODIFIED="1786999472144" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$configurate.coverage" NAME="configurate Coverage Results" MODIFIED="1787077657854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
-    <SUITE FILE_PATH="coverage/osvetleni_bp$main__2_.coverage" NAME="main (2) Coverage Results" MODIFIED="1793315680114" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$main__2_.coverage" NAME="main (2) Coverage Results" MODIFIED="1793364733343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$main.coverage" NAME="main Coverage Results" MODIFIED="1775817135428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/dokumenty/oslava" />
-    <SUITE FILE_PATH="coverage/osvetleni_bp$.coverage" NAME=" Coverage Results" MODIFIED="1792901611933" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/tests" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$.coverage" NAME=" Coverage Results" MODIFIED="1793363570921" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/tests" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$struktura.coverage" NAME="struktura Coverage Results" MODIFIED="1775939975721" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$test.coverage" NAME="test Coverage Results" MODIFIED="1793065060307" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/others" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$nastroje.coverage" NAME="nastroje Coverage Results" MODIFIED="1773523683862" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />

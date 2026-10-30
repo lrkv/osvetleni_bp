@@ -290,6 +290,11 @@ Pro testy frontendu, ze složky `frontend`:
 node --test tests/lighting.test.mjs tests/eventGroups.test.mjs
 ```
 
+V PyCharmu musí testy používat stejné prostředí, do kterého jste nainstalovali
+`requirements-dev.txt`. Pokud používáte přímo `C:\Python314\python.exe`, spusťte
+`C:\Python314\python.exe -m pip install -r backend/requirements-dev.txt` v kořeni projektu.
+Balíček `httpx` je potřebný pro testy a je uveden v `requirements-dev.txt`.
+
 Backendové testy používají lokální testovací servery; neovládají skutečné kolejiště.
 
 ## 12. Linux a macOS

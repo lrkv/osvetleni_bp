@@ -26,10 +26,10 @@ mtb:
 
 # Spojení s panelovým serverem hJOP.
 hjop:
-  enabled: true  # true = hJOP; false = reálný čas backendu
+  enabled: true  # true = přednostně hJOP, jinak systémový čas; false = pouze systémový
   host: "localhost"  # localhost = počítač s backendem
   port: 5896
   timeout: 5  # Limit připojení a první synchronizace
   reconnect_delay: 3  # Prodleva před novým připojením
   idle_timeout: 20  # Limit čekání na zprávu včetně PING
-  sync_timeout: 240  # Limit čekání na synchronizaci času
+  sync_timeout: 240  # Limit synchronizace běžícího modelového času

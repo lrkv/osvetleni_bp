@@ -124,7 +124,7 @@ hjop:
 
 Panelový server hJOP musí být zapnutý a dostupný na uvedené adrese.
 Pro použití skutečného systémového času backendu nastavte `enabled: false`.
-Při nedostupném hJOP aplikace automaticky nepřechází na systémový čas; web ukáže stav spojení.
+Při nedostupném hJOP nebo vypnutém modelovém čase aplikace automaticky použije systémový čas backendu. Web ukazuje zdroj i důvod přepnutí. Zapnutý, ale pozastavený modelový čas zůstává pozastavený. Protokol hJOP neposílá systémový čas vzdáleného serveru.
 
 Po změně backendových YAML souborů restartujte backend.
 Před prvním spuštěním zkontrolujte adresy světel: po připojení k MTB backend začne odesílat jejich požadované stavy.

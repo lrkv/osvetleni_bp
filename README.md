@@ -156,7 +156,7 @@ npm run build
 - `vyloha`: svítí nepřetržitě, také v noci.
 
 Východ a západ se berou z `sunrise` a `sunset`. Časové rozvrhy používají
-modelový čas hJOP; při explicitním vypnutí hJOP reálný místní čas backendu. Změna jiného světla ani opakovaný výběr stejného algoritmu chodby
+modelový čas hJOP; při nedostupném či vypnutém modelovém čase místní systémový čas backendu. Změna jiného světla ani opakovaný výběr stejného algoritmu chodby
 nerestartují její časování. Změna režimu, restart backendu a nová noc založí nový
 náhodný průběh. Stav se přepočítává přibližně jednou za sekundu.
 
@@ -186,13 +186,13 @@ běhu, pozastavení nebo spojení. Hodiny se posílají samostatnou WebSocket zp
 přibližně každou skutečnou sekundu, pokud se změnily. Strom světel se posílá
 pouze při změně, frontend neposílá pravidelné HTTP dotazy.
 
-Při výpadku hJOP se poslední čas zastaví a web ukáže odpojení; spojení se obnovuje
-automaticky. Bez první synchronizace jsou časově závislé výstupy vypnuté,
-trvalé režimy fungují. Neaktivní modelový čas je označen ve webu.
-Nedochází k automatickému přepnutí na hodiny počítače. Pro vědomé použití
-reálného času nastavte `hjop.enabled: false`: web zobrazí **Reálný čas**,
-rychlost **1×** a zdroj „Systémový čas backendu“. Panelový protokol hJOP
-poskytuje modelový čas, nikoli čas systémových hodin vzdáleného serveru.
+Při výpadku hJOP, čekání na synchronizaci nebo vypnutém modelovém čase se
+používá systémový čas backendu. Po obnovení aktivního modelového času se aplikace
+automaticky vrátí k hJOP. Zapnutý, ale pozastavený modelový čas zůstává pozastavený.
+Web vždy ukazuje zdroj času, rychlost a důvod případného přepnutí.
+`hjop.enabled: false` vynutí systémový čas backendu.
+Protokol `MOD-CAS` neposkytuje systémové hodiny vzdáleného serveru hJOP;
+při vypnutém modelovém čase se proto nepoužívá jeho poslední modelová hodnota.
 
 U `chodba` určuje modelový čas den/noc, ale rozsvícení 20–30 sekund a náhodné
 pauzy 1–5 minut vždy běží ve **skutečných sekundách**, i při pozastaveném
@@ -251,7 +251,7 @@ Nová světla se vybírají přednostně z těch, která byla nejdéle zhasnutá
 při shodě náhodně. Opětovný výběr stejného algoritmu ani změna jiného světla
 nerestartuje probíhající intervaly. Ruční změna na jiný algoritmus se provede
 okamžitě a časování domácnosti pro dané světlo zruší. Restart backendu časování
-vytvoří znovu. Před první synchronizací hJOP zůstávají domácnosti zhasnuté.
+vytvoří znovu. Před první synchronizací hJOP se domácnosti řídí systémovým časem backendu.
 
 
 Rozvrh lze měnit v `household.schedule` v `backend/configurate/algorithms.yaml`.

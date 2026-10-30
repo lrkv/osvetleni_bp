@@ -40,9 +40,10 @@ class HjopClock:
 
     def status(self):
         now = self.now()
+        fresh = not (self.used and self.running) or monotonic() - self._received_at < self.sync_timeout
         return {
             "source": "hjop", "time": now.strftime("%H:%M:%S") if now else None,
-            "connected": self.connected, "available": self.connected and self.synced and self.used,
+            "connected": self.connected, "available": self.connected and self.synced and self.used and fresh,
             "running": self.running and self.connected and self.synced and self.used,
             "used": self.used, "speed": self.speed, "error": self.error,
         }
@@ -89,7 +90,8 @@ class HjopClock:
                 deadline = monotonic() + self.timeout
                 while True:
                     remaining = (self.sync_timeout - (monotonic() - self._received_at)
-                                 if self.synced else deadline - monotonic())
+                                 if self.synced and self.used and self.running else
+                                 math.inf if self.synced else deadline - monotonic())
                     if remaining <= 0:
                         raise TimeoutError("hJOP neposlal synchronizaci času.")
                     line = await asyncio.wait_for(reader.readline(), min(self.idle_timeout, remaining))

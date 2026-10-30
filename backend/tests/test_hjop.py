@@ -90,7 +90,9 @@ class ClockTests(unittest.TestCase):
         clock.apply_time("-;MOD-CAS;0;9;12:00:00;0".split(";"))
         self.assertFalse(clock.status()["available"])
 
-    def test_algorithm_uses_model_time_and_static_modes_work_before_sync(self):
+    @patch("service.datetime")
+    def test_algorithm_uses_model_time_and_static_modes_work_before_sync(self, system_time):
+        system_time.now.return_value = datetime(2026, 10, 30, 22, 0)
         settings = load_settings()
         settings["hjop"] = {"enabled": True}
         settings["configurate"] = "lrkv_tt.yaml"
@@ -109,7 +111,46 @@ class ClockTests(unittest.TestCase):
             self.assertEqual(service.daemon.desired[1][0], 0)
             service.model_clock.apply_time("-;MOD-CAS;0;9;12:00:00;1".split(";"))
             service.model_clock.freeze()
-            self.assertEqual(service.daemon.desired[1][0], 1)
+            self.assertEqual(service.daemon.desired[1][0], 0)
+
+    @patch("service.datetime")
+    def test_clock_selection_fallback_recovery_and_pause(self, system_time):
+        system_time.now.return_value = datetime(2026, 10, 30, 12, 1, 10)
+        settings = load_settings()
+        settings["hjop"] = {"enabled": True}
+        service = LightingService(settings)
+        service.manager.items_by_id = {
+            1: {"id": 1, "name": "Minute", "address": "1:0", "algorithm": "minuta"},
+        }
+        def check(source, reason, on):
+            service.recalculate()
+            status = service.time_status()
+            self.assertEqual((status["source"], status["reason"]), (source, reason))
+            self.assertEqual(service.daemon.desired[1][0], on)
+            self.assertEqual(json.loads(service.clock_snapshot)["clock"], status)
+            self.assertEqual(json.loads(service.subscribe().get_nowait())["clock"], status)
+        check("system", "hjop_unavailable", 1)
+        service.model_clock.connected = True
+        check("system", "waiting_for_sync", 1)
+        with patch("hjop.monotonic", return_value=0) as timer:
+            service.model_clock.apply_time("-;MOD-CAS;0;6;03:00:00;0".split(";"))
+            check("system", "model_disabled", 1)
+            self.assertEqual(service.time_status()["time"], "12:01:10")
+            service.model_clock.apply_time("-;MOD-CAS;1;6;03:00:00;1".split(";"))
+            check("hjop", "model", 0)
+            timer.return_value = 241
+            check("system", "sync_expired", 1)
+            service.model_clock.apply_time("-;MOD-CAS;0;6;03:00:00;1".split(";"))
+            timer.return_value = 1000
+            check("hjop", "model", 0)
+            self.assertFalse(service.time_status()["running"])
+            service.model_clock.freeze()
+            check("system", "hjop_unavailable", 1)
+            service.model_clock.connected = True
+            service.model_clock.apply_time("-;MOD-CAS;1;6;03:00:00;1".split(";"))
+            check("hjop", "model", 0)
+            service.use_hjop = False
+            check("system", "hjop_disabled", 1)
 
     def test_corridor_durations_stay_real_seconds(self):
         settings = load_settings()

@@ -76,8 +76,18 @@ test('UI receives pushes, reconnects, sends commands and cleans up', async () =>
     assert.equal(lighting.clockStatus.value, 'Pozastaveno')
     assert.equal(lighting.clockSpeed.value, 'Zrychlení: 2,5×')
     sockets[0].push({ type: 'clock', clock: { source: 'system', time: '12:00:00', speed: 1 } })
-    assert.equal(lighting.clockType.value, 'Reálný čas')
+    assert.equal(lighting.clockType.value, 'Systémový čas backendu')
     assert.equal(lighting.clockSpeed.value, 'Rychlost: 1×')
+    for (const [reason, expected] of [
+      ['hjop_unavailable', /hJOP nedostupné/],
+      ['model_disabled', /není zapnutý/],
+      ['waiting_for_sync', /synchronizaci/],
+      ['sync_expired', /vypršela/],
+    ]) {
+      sockets[0].push({ type: 'clock', clock: { source: 'system', time: '12:00:00', speed: 1, reason } })
+      assert.equal(lighting.clockType.value, 'Systémový čas backendu')
+      assert.match(lighting.clockStatus.value, expected)
+    }
     sockets[0].push({ type: 'clock', clock: { ...modelClock, connected: false } })
     assert.match(lighting.clockStatus.value, /odpojeno/)
     assert.equal(lighting.algorithmLabel('disco'), 'Blikání (disco)')

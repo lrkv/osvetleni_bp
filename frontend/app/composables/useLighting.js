@@ -92,7 +92,7 @@ export function useLighting() {
   }
 
   const clockType = computed(() => !clock.value ? 'Čas' :
-    clock.value.source === 'system' ? 'Reálný čas' : 'Modelový čas hJOP')
+    clock.value.source === 'system' ? 'Systémový čas backendu' : 'Modelový čas hJOP')
   const clockSpeed = computed(() => {
     const value = clock.value
     if (!value) return ''
@@ -105,7 +105,13 @@ export function useLighting() {
     if (!connected.value) return 'Backend odpojený – zobrazený čas není aktuální.'
     const value = clock.value
     if (!value) return 'Čekám na čas z hJOP…'
-    if (value.source === 'system') return 'Systémový čas backendu'
+    if (value.source === 'system') return ({
+      hjop_disabled: 'hJOP je vypnuté v konfiguraci',
+      hjop_unavailable: 'hJOP nedostupné – náhradní čas',
+      waiting_for_sync: 'Čekám na synchronizaci hJOP – náhradní čas',
+      model_disabled: 'Modelový čas hJOP není zapnutý',
+      sync_expired: 'Synchronizace hJOP vypršela – náhradní čas',
+    })[value.reason] || 'Systémový čas backendu'
     if (!value.connected) return 'hJOP odpojeno – čas je zastavený.'
     if (!value.available) return value.used ? 'Čekám na synchronizaci hJOP…' : 'Modelový čas není aktivní.'
     return value.running ? 'Běží' : 'Pozastaveno'

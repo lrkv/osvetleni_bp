@@ -155,8 +155,10 @@ class HouseholdIntegrationTests(unittest.TestCase):
         self.assertEqual(manager._households.min_on_seconds, 45)
         self.assertEqual(manager._households.max_on_seconds, 90)
         self.assertEqual(manager._households.min_off_seconds, 35)
-        service.recalculate()
-        self.assertEqual(sum(sum(ports.values()) for ports in service.daemon.desired.values()), 0)
+        with patch("service.datetime") as system_time, patch("algorithms.monotonic", return_value=0):
+            system_time.now.return_value = instant("12:00:00")
+            service.recalculate()
+        self.assertEqual(sum(sum(ports.values()) for ports in service.daemon.desired.values()), 1)
         service.model_clock.connected = True
         with patch("algorithms.monotonic", return_value=0), patch("hjop.monotonic", return_value=0):
             service.model_clock.apply_time("-;MOD-CAS;0;9;19:00:00;1".split(";"))

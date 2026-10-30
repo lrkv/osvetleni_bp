@@ -81,32 +81,50 @@ class LightingService:
             on_change=self.publish,
         )
 
+    def selected_time(self):
+        status = self.model_clock.status()
+        if self.use_hjop and status["available"]:
+            now = self.model_clock.now()
+            return now, {**status, "time": now.strftime("%H:%M:%S"), "reason": "model"}
+        if not self.use_hjop:
+            reason = "hjop_disabled"
+        elif not status["connected"]:
+            reason = "hjop_unavailable"
+        elif not self.model_clock.synced:
+            reason = "waiting_for_sync"
+        elif not status["used"]:
+            reason = "model_disabled"
+        else:
+            reason = "sync_expired"
+        # MOD-CAS does not transmit the remote server's system clock.
+        now = datetime.now()
+        return now, {"source": "system", "time": now.strftime("%H:%M:%S"),
+                     "connected": True, "available": True, "running": True,
+                     "used": True, "speed": 1, "reason": reason,
+                     "error": status["error"] if self.use_hjop else None}
+
     def time_status(self):
-        if self.use_hjop:
-            return self.model_clock.status()
-        return {"source": "system", "time": datetime.now().strftime("%H:%M:%S"),
-                "connected": True, "available": True, "running": True,
-                "used": True, "speed": 1, "error": None}
+        return self.selected_time()[1]
 
     def recalculate(self):
-        now = self.model_clock.now() if self.use_hjop else datetime.now()
+        now, status = self.selected_time()
         for module, outputs in self.manager.calculate_outputs(self.sunrise, self.sunset, now=now).items():
             self.daemon.set_outputs(module, outputs)
         self.publish()
-        self.publish_clock()
-        self.publish_events(now)
+        self.publish_clock(status)
+        self.publish_events(now, status)
 
-    def publish_events(self, now):
+    def publish_events(self, now, status=None):
         forecast = upcoming_events(self.manager, self.sunrise, self.sunset, now,
-                                   self.time_status(), datetime.now())
+                                   status if status is not None else self.time_status(), datetime.now())
         message = json.dumps({"type": "events", "upcoming": forecast}, ensure_ascii=False)
         if message != self.events_snapshot:
             self.events_snapshot = message
             for queue in self.subscribers:
                 queue.put("events", message)
 
-    def publish_clock(self):
-        message = json.dumps({"type": "clock", "clock": self.time_status()}, ensure_ascii=False)
+    def publish_clock(self, status=None):
+        message = json.dumps({"type": "clock", "clock": status if status is not None else self.time_status()}, ensure_ascii=False)
         if message == self.clock_snapshot:
             return
         self.clock_snapshot = message

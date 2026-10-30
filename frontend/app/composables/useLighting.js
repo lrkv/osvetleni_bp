@@ -3,10 +3,14 @@ import { resolveBackendUrls } from '../utils/backendUrl.js'
 
 export function useLighting() {
   const data = ref(null)
+  const upcoming = ref(null)
   const hardware = ref(null)
   const clock = ref(null)
   const configurationErrors = ref([])
   const availableAlgorithms = ref([])
+  const algorithmLabels = ref({})
+  const algorithmLabel = (id) => algorithmLabels.value[id] ||
+    (id ? id.replaceAll('_', ' ') : 'Chybějící algoritmus')
   const connected = ref(false)
   const error = ref('')
   const pending = computed(() => !data.value && !error.value)
@@ -42,11 +46,13 @@ export function useLighting() {
         try {
           const message = JSON.parse(event.data)
           if (message.clock) clock.value = message.clock
+          if (message.upcoming) upcoming.value = message.upcoming
           if (message.type !== 'state') return
           data.value = message.structure
           hardware.value = message.hardware
           configurationErrors.value = message.configuration_errors || []
           availableAlgorithms.value = message.algorithms
+          algorithmLabels.value = message.algorithm_labels || {}
           connected.value = true
           error.value = ''
           retryDelay = 500
@@ -124,6 +130,6 @@ export function useLighting() {
     socket?.close()
   })
 
-  return { data, hardware, clock, clockType, clockSpeed, clockStatus, configurationErrors, availableAlgorithms, connected, error, pending,
+  return { data, upcoming, hardware, clock, clockType, clockSpeed, clockStatus, configurationErrors, availableAlgorithms, algorithmLabel, connected, error, pending,
     hardwareMessage, updateAlgorithm }
 }

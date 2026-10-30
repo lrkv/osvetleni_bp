@@ -56,12 +56,15 @@ test('UI receives pushes, reconnects, sends commands and cleans up', async () =>
     await new Promise(resolve => setTimeout(resolve, 10))
     assert.equal(sockets.length, 1)
     assert.equal(sockets[0].url, 'ws://192.168.1.20:8000/api/ws')
-    const state = { type: 'state', structure: { layout_name: 'Test' }, algorithms: ['disco'],
+    const state = { type: 'state', structure: { layout_name: 'Test' }, algorithms: ['disco'], algorithm_labels: { disco: 'Blikání (disco)' },
       hardware: { connected: true, error: null, module_errors: {}, pending_modules: [] } }
     sockets[0].push(state)
     assert.equal(lighting.connected.value, true)
     assert.equal(lighting.data.value.layout_name, 'Test')
     const originalTree = lighting.data.value
+    sockets[0].push({ type: 'events', upcoming: { events: [{ id: 1, on: true, seconds: 20 }], unknown: [] } })
+    assert.equal(lighting.upcoming.value.events[0].seconds, 20)
+    assert.equal(lighting.data.value, originalTree)
     const modelClock = { source: 'hjop', time: '02:25:21', connected: true,
       available: true, used: true, running: true, speed: 9 }
     sockets[0].push({ type: 'clock', clock: modelClock })
@@ -77,6 +80,8 @@ test('UI receives pushes, reconnects, sends commands and cleans up', async () =>
     assert.equal(lighting.clockSpeed.value, 'Rychlost: 1×')
     sockets[0].push({ type: 'clock', clock: { ...modelClock, connected: false } })
     assert.match(lighting.clockStatus.value, /odpojeno/)
+    assert.equal(lighting.algorithmLabel('disco'), 'Blikání (disco)')
+    assert.equal(lighting.algorithmLabel('new_mode'), 'new mode')
     await lighting.updateAlgorithm(3, 'disco')
     assert.equal(posts[0].url, 'http://192.168.1.20:8000/api/algorithm')
     assert.deepEqual(posts[0].options.body, { item_id: 3, new_algorithm: 'disco' })

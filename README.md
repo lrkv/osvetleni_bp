@@ -3,6 +3,8 @@
 Python/FastAPI řídí osvětlení přes MTB Daemon. Nuxt/Vue zobrazuje strom kolejiště
 a umožňuje měnit algoritmy jednotlivých světel i celých skupin.
 
+Podrobný postup instalace na nový počítač a spuštění pro běžný provoz je v [NASAZENI.md](NASAZENI.md).
+
 ## Spuštění
 
 Python 3.11 nebo novější. Z kořene projektu:
@@ -59,10 +61,14 @@ nasazenou kopii nebo nasaďte nový build.
 
 ## Nastavení backendu
 
-`backend/config.yaml` obsahuje:
+`backend/configurate/config.yaml` obsahuje:
 
-- `light`: časy východu a západu slunce.
-- `configurate`: název YAML souboru v `backend/configurate/`.
+- `layout.file`: cesta k souboru struktury kolejiště.
+- `algorithms_file`: cesta k nastavení algoritmů (`backend/configurate/algorithms.yaml`).
+- `hjop`: připojení ke zdroji modelového času.
+
+Cesty jsou relativní vůči `config.yaml`. Starší konfigurace s `light` a `configurate` jsou nadále podporované.
+
 - `server.host` a `server.port`: rozhraní a port HTTP/WebSocket serveru.
 - `server.allowed_origins`: povolené adresy frontendů, včetně protokolu a portu.
 - `server.allowed_origin_regex`: výchozí povolení localhostu a privátních IPv4
@@ -104,7 +110,7 @@ není fyzické měření svítící lampy. Změny algoritmů zůstávají v pam�
 a při restartu se obnoví z YAML.
 
 Podporované algoritmy frontend dostává z backendu. `drazni_osvetleni` zapíná
-15 minut po `light.sunset` a vypíná 15 minut před `light.sunrise` z `backend/config.yaml`.
+15 minut po `sunset` a vypíná 15 minut před `sunrise` z `backend/configurate/algorithms.yaml`.
 Při hodnotách 20:09 a 5:32 svítí od 20:24 včetně do 05:17 (v 05:17 už je vypnuté).
 Interval funguje i přes půlnoc. API neznámé algoritmy odmítá.
 Pokud je nepodporovaný algoritmus už v YAML, backend přesto nastartuje: pro tento
@@ -140,17 +146,16 @@ npm run build
 
 ## Další algoritmy osvětlení
 
-- `byt`: svítí od západu slunce do 21:00 a od 05:00 do východu slunce.
-  Je-li západ až po 21:00 nebo východ už před 05:00, příslušný interval nesvítí.
+- `domacnost`: společně řídí podíl rozsvícených domácností podle denního rozvrhu níže.
 - `chodba`: mezi západem a východem slunce se pro každé světlo zvlášť střídá
   náhodná pauza 1–5 minut a rozsvícení na 20–30 sekund. První rozsvícení po
   aktivaci v noci také následuje po náhodné pauze. Při východu slunce zhasne
-  i případné probíhající rozsvícení. Pauzy lze změnit v `light.chodba.pause_min_seconds`
-  a `light.chodba.pause_max_seconds` v `backend/config.yaml` (výchozí 60 a 300).
+  i případné probíhající rozsvícení. Pauzy lze změnit v `corridor.pause_min_seconds`
+  a `corridor.pause_max_seconds` v `backend/configurate/algorithms.yaml` (výchozí 60 a 300).
 - `prodejna`: svítí od 07:00 včetně do 19:00; v 19:00 už je vypnutá.
 - `vyloha`: svítí nepřetržitě, také v noci.
 
-Východ a západ se berou z `light.sunrise` a `light.sunset`. Časové rozvrhy používají
+Východ a západ se berou z `sunrise` a `sunset`. Časové rozvrhy používají
 modelový čas hJOP; při explicitním vypnutí hJOP reálný místní čas backendu. Změna jiného světla ani opakovaný výběr stejného algoritmu chodby
 nerestartují její časování. Změna režimu, restart backendu a nová noc založí nový
 náhodný průběh. Stav se přepočítává přibližně jednou za sekundu.
@@ -158,7 +163,7 @@ náhodný průběh. Stav se přepočítává přibližně jednou za sekundu.
 
 ## Čas hJOP
 
-V `backend/config.yaml` je spojení s panelovým serverem hJOP:
+V `backend/configurate/config.yaml` je spojení s panelovým serverem hJOP:
 
 ```yaml
 hjop:
@@ -191,7 +196,92 @@ poskytuje modelový čas, nikoli čas systémových hodin vzdáleného serveru.
 
 U `chodba` určuje modelový čas den/noc, ale rozsvícení 20–30 sekund a náhodné
 pauzy 1–5 minut vždy běží ve **skutečných sekundách**, i při pozastaveném
-modelovém čase. Nastavení `light.sunrise` a `light.sunset` zůstává v platnosti.
+modelovém čase. Nastavení `sunrise` a `sunset` zůstává v platnosti.
 Po úpravě konfigurace restartujte backend.
 
 Protokol: [hJOP panel server](https://github.com/kmzbrnoI/hJOPserver/wiki/panelServer).
+
+
+## Domácnosti
+
+Algoritmus `domacnost` řídí všechna takto označená světla společně napříč domy,
+skupinami i MTB moduly. Ostatní algoritmy se do počtu domácností nezahrnují.
+Na webu se zobrazuje jako **Domácnost**. Dřívější `byt` byl odstraněn
+z implementace i nabídky a ve všech dodaných YAML nahrazen za `domacnost`.
+
+| Čas | Cílový podíl rozsvícených domácností |
+|---|---|
+| 19:00–21:00 | 70 % |
+| 21:00–23:00 | Plynulý pokles ze 70 % na 40 % |
+| 23:00–04:00 | 10 % |
+| 04:00–05:00 | Plynulý růst z 10 % na 50 % |
+| 05:00–06:00 | 70 % |
+| 06:00–08:00 | 50 % |
+| 08:00–19:00 | 5 % |
+
+Čas rozvrhu pochází z hJOP, případně ze systémových hodin, pokud je hJOP vypnuté
+v konfiguraci. Rozvrh domácností nezávisí na východu a západu slunce.
+Ve 23:00 se cíl změní ze 40 % na 10 %, v 05:00 z 50 % na 70 %.
+
+V `backend/configurate/algorithms.yaml`:
+
+```yaml
+household:
+  min_on_seconds: 30
+  max_on_seconds: 300
+  min_off_seconds: 30
+```
+
+Doba každého rozsvícení se náhodně vybírá mezi minimem a maximem.
+Všechny tři doby používají skutečné sekundy, také při zrychleném nebo pozastaveném
+modelovém čase. Po zhasnutí se stejné světlo nesmí zapnout alespoň 30 sekund.
+Časování probíhá v existující sekundové smyčce backendu, přepnutí tedy může
+nastat až na následujícím přepočtu (běžně do jedné sekundy).
+
+Počet světel se zaokrouhluje na nejbližší celé číslo (polovina nahoru).
+Například 13 domácností: při 70 % je cíl 9 světel, při 5 % jedno světlo;
+u tří domácností znamená 5 % cíl nula světel.
+Minimální doba svícení a zhasnutí má přednost před okamžitým dosažením procenta.
+Při poklesu cíle se proto právě rozsvícená světla nezhasnou před uplynutím minima.
+Při vypršení doby svícení se zhasne vždy; není-li zatím dost způsobilých náhrad,
+bude podíl dočasně nižší. Krátké svícení s dlouhými pauzami může znemožnit
+udržování vysokého podílu i dlouhodobě.
+
+Nová světla se vybírají přednostně z těch, která byla nejdéle zhasnutá;
+při shodě náhodně. Opětovný výběr stejného algoritmu ani změna jiného světla
+nerestartuje probíhající intervaly. Ruční změna na jiný algoritmus se provede
+okamžitě a časování domácnosti pro dané světlo zruší. Restart backendu časování
+vytvoří znovu. Před první synchronizací hJOP zůstávají domácnosti zhasnuté.
+
+
+Rozvrh lze měnit v `household.schedule` v `backend/configurate/algorithms.yaml`.
+Každá položka obsahuje `time: "HH:MM"` a `percent: 0–100`.
+Podíl platí od daného času do další položky; poslední interval pokračuje přes půlnoc
+k prvnímu času. Položky se řadí podle času automaticky, časy se nesmějí opakovat.
+Volitelné `end_percent` určuje plynulý přechod z `percent` na tuto hodnotu během
+celého intervalu. Bez `end_percent` je podíl po celý interval konstantní.
+Například `time: "21:00", percent: 70, end_percent: 40` před položkou ve 23:00
+znamená pokles ze 70 % na 40 % během dvou hodin. Ve 23:00 začne platit procento
+z nové položky (aktuálně 10 %). Změna rozvrhu vyžaduje restart backendu.
+
+Nastavení chodby je v `backend/configurate/algorithms.yaml` pod anglickým klíčem `corridor`.
+`min_on_seconds` a `max_on_seconds` nastavují délku svícení (výchozí 20–30 s);
+`pause_min_seconds` a `pause_max_seconds` délku pauzy. Vše ve skutečných sekundách.
+Identifikátor algoritmu ve struktuře kolejiště zůstává `chodba`, na webu „Chodba“.
+
+### Budoucí události
+
+Stránka `/udalosti` zobrazuje změny od nejbližší, včetně času, světla, skupiny a algoritmu.
+Denní rozvrhy ukazuje na 24 hodin času kolejiště dopředu. Odpočty jsou ve skutečném čase
+při aktuální rychlosti hJOP; při zastaveném modelovém čase čekají za skutečnými časovači.
+U chodby je známá nejbližší již vylosovaná změna (východ slunce ji může zrušit).
+U domácnosti se zobrazuje nejzazší zhasnutí; pokles cílového podílu může způsobit dřívější
+zhasnutí. Další náhodné rozsvícení ještě není určeno a je uvedeno zvlášť.
+Přehled plán nijak neovlivňuje. Události přicházejí stejným WebSocketem jako stav,
+bez pollování; aktualizují se při přepočtu plánu. Změna algoritmu nebo času hJOP plán změní.
+Zobrazený čas je plán změny požadovaného stavu, nikoli potvrzení sepnutí hardwaru.
+
+Algoritmus `minuta` (na webu „Minuta“) svítí v liché minutě a zhasíná v sudé minutě
+času kolejiště, včetně přechodu 23:59 → 00:00. Události ukazují jeho dvě nejbližší změny.
+Současné události sdílejí jeden odpočet a světla se řadí vedle sebe. U skutečných
+časovačů se čas hJOP odhaduje podle aktuální rychlosti; při pozastavení není předpovídán.

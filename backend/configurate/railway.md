@@ -24,12 +24,11 @@ Konkrétní fyzické světlo s hardwarovou adresou.
 Určují chování světla vůči reálnému/modelovému času:
 * `"trvale_zapnuto"` - Svítí nepřetržitě (servis, důležitá hradla).
 * `"trvale_vypnuto"` - Zhasnuto (nefunkční lampy, prázdné budovy).
-* `"domacnost"` - Náhodné rozsvěcování a zhasínání (simulace života).
+* `"domacnost"` - Společný podíl rozsvícených domácností podle denního rozvrhu (5–70 %); svícení 30–300 skutečných sekund, zhasnutí nejméně 30 sekund. Rozvrh a nastavení `light.household` jsou popsané v hlavním README.
 * `"poulicni_lampa"` - Spíná se při západu slunce, vypíná při východu.
-* `"drazni_osvetleni"` - Zapíná 15 minut po západu a vypíná 15 minut před východem slunce; časy bere z `light.sunset` a `light.sunrise` v `backend/config.yaml`.
+* `"drazni_osvetleni"` - Zapíná 15 minut po západu a vypíná 15 minut před východem slunce; časy bere z `sunset` a `sunrise` v `backend/configurate/algorithms.yaml`.
 * `"disco"` - Rychlé střídání stavů (reklama, hospoda, svářeč).
 
-* `"byt"` - Od západu do 21:00 a od 05:00 do východu slunce.
 * `"chodba"` - V noci náhodné rozsvícení na 20–30 sekund, mezi nimi pauzy 1–5 minut; každé světlo nezávisle.
 * `"prodejna"` - Od 07:00 do 19:00, konec intervalu už je vypnutý.
 * `"vyloha"` - Nepřetržitě zapnuto ve dne i v noci.

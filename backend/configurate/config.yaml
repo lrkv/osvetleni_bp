@@ -1,0 +1,35 @@
+# Po změně nastavení restartujte backend. Limity a prodlevy jsou v sekundách.
+
+# Struktura kolejiště; cesty jsou relativní vůči tomuto souboru.
+layout:
+  file: "vystava_test.yaml"
+
+# Časy, intervaly a rozvrhy algoritmů.
+algorithms_file: "algorithms.yaml"
+
+server:
+  host: "0.0.0.0"  # 0.0.0.0 = přístup z LAN
+  port: 8000  # HTTP API a WebSocket
+  # Povolené adresy frontendu (protokol, hostname/IP a port).
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+  # Navíc povoluje localhost a privátní IPv4 adresy v LAN.
+  allowed_origin_regex: 'https?://(localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?'
+
+# Spojení s MTB démonem.
+mtb:
+  host: "127.0.0.1"  # 127.0.0.1 = počítač s backendem
+  port: 3841
+  timeout: 5  # Limit připojení a potvrzení příkazu
+  reconnect_delay: 3  # Prodleva před opakováním
+
+# Spojení s panelovým serverem hJOP.
+hjop:
+  enabled: true  # true = hJOP; false = reálný čas backendu
+  host: "localhost"  # localhost = počítač s backendem
+  port: 5896
+  timeout: 5  # Limit připojení a první synchronizace
+  reconnect_delay: 3  # Prodleva před novým připojením
+  idle_timeout: 20  # Limit čekání na zprávu včetně PING
+  sync_timeout: 240  # Limit čekání na synchronizaci času

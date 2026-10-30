@@ -1,8 +1,9 @@
 import logging
 from pathlib import Path
+from datetime import datetime
 
 import yaml
-from algorithms import CorridorLighting, evaluate_algorithm
+from algorithms import ALGORITHM_LABELS, CorridorLighting, HouseholdLighting, evaluate_algorithm
 
 logger = logging.getLogger(__name__)
 
@@ -10,13 +11,36 @@ SYSTEM_TIME = object()
 STATIC_ALGORITHMS = {"trvale_zapnuto", "trvale_vypnuto", "vyloha", "disco"}
 
 BASE_DIR = Path(__file__).resolve().parent
-SUPPORTED_ALGORITHMS = ("trvale_zapnuto", "trvale_vypnuto", "domacnost", "poulicni_lampa", "drazni_osvetleni", "byt", "chodba", "prodejna", "vyloha", "disco")
+SUPPORTED_ALGORITHMS = tuple(ALGORITHM_LABELS)
 
 
 def load_settings(file_source=None):
-    path = Path(file_source) if file_source else BASE_DIR / "config.yaml"
-    with path.open(encoding="utf-8") as file:
-        return yaml.safe_load(file)
+    path = Path(file_source) if file_source else BASE_DIR / "configurate" / "config.yaml"
+    path = path.resolve()
+
+    def read_mapping(source):
+        with source.open(encoding="utf-8") as file:
+            value = yaml.safe_load(file)
+        if not isinstance(value, dict):
+            raise ValueError(f"Konfigurace {source} musí obsahovat YAML sekce.")
+        return value
+
+    data = read_mapping(path)
+    if "algorithms_file" in data:
+        if "light" in data:
+            raise ValueError("Použijte algorithms_file, nebo původní light, nikoli obojí.")
+        data["light"] = read_mapping(path.parent / data["algorithms_file"])
+    if "layout" in data:
+        if "configurate" in data:
+            raise ValueError("Použijte layout.file, nebo původní configurate, nikoli obojí.")
+        data["configurate"] = str((path.parent / data["layout"]["file"]).resolve())
+    # Keep accepting older single-file configurations.
+    light = data.get("light", {})
+    if "chodba" in light:
+        if "corridor" in light:
+            raise ValueError("Nastavení chodby je uvedeno dvakrát; použijte corridor.")
+        light["corridor"] = light.pop("chodba")
+    return data
 
 
 def load_configuration(file_source=None):
@@ -25,11 +49,17 @@ def load_configuration(file_source=None):
 
 
 class ConfigManager:
-    def __init__(self, corridor_pause_min=60, corridor_pause_max=300):
+    def __init__(self, corridor_pause_min=60, corridor_pause_max=300, *,
+                 corridor_min_on_seconds=20, corridor_max_on_seconds=30,
+                 household_min_on_seconds=30, household_max_on_seconds=300, household_min_off_seconds=30, household_schedule=None):
         # Validate once, before any background task is started.
-        CorridorLighting(corridor_pause_min, corridor_pause_max)
+        CorridorLighting(corridor_pause_min, corridor_pause_max, corridor_min_on_seconds, corridor_max_on_seconds)
+        self.corridor_min_on_seconds = corridor_min_on_seconds
+        self.corridor_max_on_seconds = corridor_max_on_seconds
         self.corridor_pause_min = corridor_pause_min
         self.corridor_pause_max = corridor_pause_max
+        self._households = HouseholdLighting(household_min_on_seconds, household_max_on_seconds,
+                                             household_min_off_seconds, schedule=household_schedule)
         self._corridors = {}
         self._last_outputs = {}
         self.tree_data = {}             # Stromová struktura pro web
@@ -43,6 +73,7 @@ class ConfigManager:
 
     def load_yaml(self, file_path='railway00.yaml'):
         self._corridors.clear()
+        self._households.reset()
         self._last_outputs.clear()
         self.items_by_id.clear()
         self.next_id = 1
@@ -121,6 +152,7 @@ class ConfigManager:
         if 'address' in item:
             if item.get('algorithm') != new_algorithm:
                 self._corridors.pop(item['id'], None)
+                self._households.forget(item['id'])
             item['algorithm'] = new_algorithm
 
         # Pokud má prvek vnořené položky (je to skupina), propíšeme změnu i do nich
@@ -131,6 +163,10 @@ class ConfigManager:
     def calculate_outputs(self, sunrise: str, sunset: str, *, now=SYSTEM_TIME):
         """Compute desired states without any network I/O."""
         modules = {}
+        household_ids = [item['id'] for item in self.items_by_id.values()
+                         if 'address' in item and item.get('algorithm') == 'domacnost']
+        household_outputs = self._households.evaluate(
+            household_ids, datetime.now() if now is SYSTEM_TIME else now)
         time_args = {} if now is SYSTEM_TIME else {"now": now}
         for item in self.items_by_id.values():
             if 'address' not in item:
@@ -147,12 +183,15 @@ class ConfigManager:
                 output = 0  # Preserve the original fallback without preventing startup.
             else:
                 item.pop('configuration_error', None)
-                if now is None and algorithm not in STATIC_ALGORITHMS:
+                if algorithm == 'domacnost':
+                    output = evaluate_algorithm(algorithm, household_output=household_outputs[item['id']])
+                elif now is None and algorithm not in STATIC_ALGORITHMS:
                     output = self._last_outputs.get(item['id'], 0)
                 elif algorithm == 'chodba':
                     if item['id'] not in self._corridors:
                         self._corridors[item['id']] = CorridorLighting(
-                            self.corridor_pause_min, self.corridor_pause_max)
+                            self.corridor_pause_min, self.corridor_pause_max,
+                            self.corridor_min_on_seconds, self.corridor_max_on_seconds)
                     output = evaluate_algorithm(algorithm, sunrise, sunset,
                                                 corridor=self._corridors[item['id']], **time_args)
                 else:

@@ -6,6 +6,8 @@ from datetime import datetime
 from configurate import BASE_DIR, ConfigManager, SUPPORTED_ALGORITHMS
 from mtb import DaemonClient
 from hjop import HjopClock
+from algorithms import ALGORITHM_LABELS
+from events import upcoming_events
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +43,17 @@ class LatestUpdates:
 
 class LightingService:
     def __init__(self, settings):
-        corridor = settings["light"].get("chodba", {})
+        corridor = settings["light"].get("corridor", {})
+        household = settings["light"].get("household", {})
         self.manager = ConfigManager(
             corridor_pause_min=corridor.get("pause_min_seconds", 60),
             corridor_pause_max=corridor.get("pause_max_seconds", 300),
+            corridor_min_on_seconds=corridor.get("min_on_seconds", 20),
+            corridor_max_on_seconds=corridor.get("max_on_seconds", 30),
+            household_min_on_seconds=household.get("min_on_seconds", 30),
+            household_max_on_seconds=household.get("max_on_seconds", 300),
+            household_min_off_seconds=household.get("min_off_seconds", 30),
+            household_schedule=household.get("schedule"),
         )
         self.manager.load_yaml(BASE_DIR / "configurate" / settings["configurate"])
         self.sunrise = str(settings["light"]["sunrise"])
@@ -52,6 +61,7 @@ class LightingService:
         self.subscribers = set()
         self.snapshot = ""
         self.clock_snapshot = ""
+        self.events_snapshot = ""
         self.tasks = []
         hjop = settings.get("hjop", {})
         self.use_hjop = hjop.get("enabled", True)
@@ -84,6 +94,16 @@ class LightingService:
             self.daemon.set_outputs(module, outputs)
         self.publish()
         self.publish_clock()
+        self.publish_events(now)
+
+    def publish_events(self, now):
+        forecast = upcoming_events(self.manager, self.sunrise, self.sunset, now,
+                                   self.time_status(), datetime.now())
+        message = json.dumps({"type": "events", "upcoming": forecast}, ensure_ascii=False)
+        if message != self.events_snapshot:
+            self.events_snapshot = message
+            for queue in self.subscribers:
+                queue.put("events", message)
 
     def publish_clock(self):
         message = json.dumps({"type": "clock", "clock": self.time_status()}, ensure_ascii=False)
@@ -99,6 +119,7 @@ class LightingService:
             "structure": self.manager.tree_data,
             "hardware": self.daemon.status(),
             "algorithms": SUPPORTED_ALGORITHMS,
+            "algorithm_labels": ALGORITHM_LABELS,
             "configuration_errors": [
                 {"id": item["id"], "name": item.get("name"),
                  "message": item["configuration_error"]}
@@ -117,6 +138,8 @@ class LightingService:
         self.subscribers.add(queue)
         initial = json.loads(self.snapshot)
         initial["clock"] = self.time_status()
+        if self.events_snapshot:
+            initial["upcoming"] = json.loads(self.events_snapshot)["upcoming"]
         queue.put("state", json.dumps(initial, ensure_ascii=False))
         return queue
 

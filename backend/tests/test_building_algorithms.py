@@ -16,23 +16,6 @@ class BuildingAlgorithmsTests(unittest.TestCase):
             clock.now.return_value = datetime.fromisoformat("2026-10-25T" + time)
             return evaluate_algorithm(algorithm, sunrise, sunset)
 
-    def test_byt_boundaries(self):
-        cases = {
-            "04:59:59": 0, "05:00:00": 1, "05:31:59": 1, "05:32:00": 0,
-            "12:00:00": 0, "20:08:59": 0, "20:09:00": 1, "20:59:59": 1,
-            "21:00:00": 0, "23:59:59": 0, "00:00:00": 0,
-        }
-        for time, expected in cases.items():
-            with self.subTest(time=time):
-                self.assertEqual(self.at("byt", time), expected)
-
-    def test_byt_uses_sun_times_and_empty_intervals_stay_off(self):
-        for time in ("04:00:00", "05:00:00", "20:59:59", "21:00:00", "22:00:00"):
-            self.assertEqual(self.at("byt", time, "04:30", "21:30"), 0)
-        self.assertEqual(self.at("byt", "06:59:59", "07:00", "17:00"), 1)
-        self.assertEqual(self.at("byt", "07:00:00", "07:00", "17:00"), 0)
-        self.assertEqual(self.at("byt", "17:00:00", "07:00", "17:00"), 1)
-
     def test_prodejna_boundaries(self):
         for time, expected in (("06:59:59", 0), ("07:00:00", 1),
                                ("18:59:59", 1), ("19:00:00", 0),
@@ -48,7 +31,7 @@ class BuildingAlgorithmsTests(unittest.TestCase):
         settings = load_settings()
         settings["configurate"] = "lrkv_tt.yaml"
         service = LightingService(settings)
-        for mode in ("byt", "chodba", "prodejna", "vyloha"):
+        for mode in ("domacnost", "chodba", "prodejna", "vyloha"):
             self.assertIn(mode, SUPPORTED_ALGORITHMS)
             item = next(x for x in service.manager.items_by_id.values() if "address" in x)
             self.assertTrue(service.manager.change_algorithm(item["id"], mode))
@@ -130,7 +113,7 @@ class CorridorTests(unittest.TestCase):
 
     def test_pause_range_is_configurable_and_validated(self):
         settings = load_settings()
-        settings["light"]["chodba"] = {"pause_min_seconds": 90, "pause_max_seconds": 180}
+        settings["light"]["corridor"] = {"pause_min_seconds": 90, "pause_max_seconds": 180}
         service = LightingService(settings)
         self.assertEqual(service.manager.corridor_pause_min, 90)
         self.assertEqual(service.manager.corridor_pause_max, 180)

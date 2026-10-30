@@ -10,7 +10,7 @@
         <span class="node-state" :title="statusLabels[groupStatus]" :aria-label="statusLabels[groupStatus]" role="img"><i class="status-dot" :class="groupStatus"></i></span>
         <select :disabled="saving || !connected" @change="updateGroup" :aria-label="'Změnit algoritmus celé skupiny ' + node.name">
           <option value="" disabled selected>Změnit vše na…</option>
-          <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algo }}</option>
+          <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algorithmLabel(algo) }}</option>
         </select>
       </div>
       <div v-show="isOpen" class="group-children">
@@ -28,8 +28,8 @@
         </div>
       </div>
       <select :disabled="saving || !connected" :value="node.algorithm" @change="updateSingle" :aria-label="'Algoritmus světla ' + node.name">
-        <option v-if="!availableAlgorithms.includes(node.algorithm)" :value="node.algorithm" disabled>{{ node.algorithm || 'Chybějící algoritmus' }} (nepodporováno)</option>
-        <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algo }}</option>
+        <option v-if="!availableAlgorithms.includes(node.algorithm)" :value="node.algorithm" disabled>{{ algorithmLabel(node.algorithm) }} (nepodporováno)</option>
+        <option v-for="algo in availableAlgorithms" :key="algo" :value="algo">{{ algorithmLabel(algo) }}</option>
       </select>
     </article>
   </div>
@@ -49,7 +49,7 @@ const isOpen = ref(false)
 const { showAddress, showId } = inject('appearance')
 const statusLabels = { all: 'Vše svítí', some: 'Část svítí', none: 'Vypnuto' }
 
-const { availableAlgorithms, connected, updateAlgorithm } = inject('lighting')
+const { availableAlgorithms, algorithmLabel, connected, updateAlgorithm } = inject('lighting')
 const saving = ref(false)
 
 // NOVÉ: Chytrý výpočet stavu pro celou skupinu

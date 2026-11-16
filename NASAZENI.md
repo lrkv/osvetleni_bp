@@ -30,7 +30,7 @@ Na cílový počítač přeneste projekt včetně těchto souborů a složek:
 ```text
 osvetleni_bp/
 ├── backend/                 # Všechny .py, requirements a YAML soubory, včetně podsložek
-│   └── configurate/          # Nastavení a struktury kolejišť
+│   └── config/          # Nastavení a struktury kolejišť
 │       ├── config.yaml
 │       ├── algorithms.yaml
 │       └── vystava_test.yaml # Příklad struktury kolejiště
@@ -65,7 +65,7 @@ Verze Python knihoven jsou omezené rozsahy, nikoli uzamčené na jednu přesnou
 
 ## 4. Nastavení backendu a kolejiště
 
-Otevřete `backend/configurate/config.yaml`.
+Otevřete `backend/config/config.yaml`.
 
 ### Struktura kolejiště
 
@@ -77,8 +77,8 @@ algorithms_file: "algorithms.yaml"
 ```
 
 `layout.file` určuje soubor se skupinami, světly, adresami výstupů a algoritmy.
-Cesty jsou relativní vůči `backend/configurate/config.yaml`. Vyberte nebo upravte strukturu odpovídající skutečnému kolejišti.
-Časy, intervaly a podíly svítících domácností nastavujte v `backend/configurate/algorithms.yaml`.
+Cesty jsou relativní vůči `backend/config/config.yaml`. Vyberte nebo upravte strukturu odpovídající skutečnému kolejišti.
+Časy, intervaly a podíly svítících domácností nastavujte v `backend/config/algorithms.yaml`.
 
 ### Server aplikace
 
@@ -337,7 +337,7 @@ Dostupnost MTB Daemona, hJOP, případných ovladačů a hardwaru řešte pro da
 
 ## Kontrola konfigurace při startu
 
-Hodnoty nastavení jsou uvedené v `backend/configurate/config.yaml` a souboru
+Hodnoty nastavení jsou uvedené v `backend/config/config.yaml` a souboru
 určeném klíčem `algorithms_file` (standardně `algorithms.yaml`). Python
 nedoplňuje náhradní hodnoty. Všechny sekce a jejich položky v dodaných souborech
 jsou povinné; výjimkou je `end_percent` u položky rozvrhu domácností, jehož

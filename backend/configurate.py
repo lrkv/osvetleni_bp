@@ -16,7 +16,7 @@ SUPPORTED_ALGORITHMS = tuple(ALGORITHMS)
 
 
 def load_settings(file_source=None):
-    path = Path(file_source) if file_source else BASE_DIR / "configurate" / "config.yaml"
+    path = Path(file_source) if file_source else BASE_DIR / "config" / "config.yaml"
     path = path.resolve()
 
     def read_mapping(source):

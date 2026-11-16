@@ -46,7 +46,7 @@ class LightingService:
     def __init__(self, settings):
         validate_settings(settings)
         self.manager = ConfigManager.from_settings(settings['light'])
-        self.manager.load_yaml(BASE_DIR / "configurate" / settings["configurate"])
+        self.manager.load_yaml(BASE_DIR / "config" / settings["configurate"])
         self.sunrise = str(settings["light"]["sunrise"])
         self.sunset = str(settings["light"]["sunset"])
         self.subscribers = set()

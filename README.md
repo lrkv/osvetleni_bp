@@ -61,13 +61,13 @@ nasazenou kopii nebo nasaďte nový build.
 
 ## Nastavení backendu
 
-`backend/configurate/config.yaml` obsahuje:
+`backend/config/config.yaml` obsahuje:
 
 - `layout.file`: cesta k souboru struktury kolejiště.
-- `algorithms_file`: cesta k nastavení algoritmů (`backend/configurate/algorithms.yaml`).
+- `algorithms_file`: cesta k nastavení algoritmů (`backend/config/algorithms.yaml`).
 - `hjop`: připojení ke zdroji modelového času.
 
-Cesty jsou relativní vůči `config.yaml`. Starší konfigurace s `light` a `configurate` jsou nadále podporované.
+Cesty jsou relativní vůči `config.yaml`. Používejte aktuální rozdělené konfigurační soubory.
 
 - `server.host` a `server.port`: rozhraní a port HTTP/WebSocket serveru.
 - `server.allowed_origins`: povolené adresy frontendů, včetně protokolu a portu.
@@ -110,7 +110,7 @@ není fyzické měření svítící lampy. Změny algoritmů zůstávají v pam�
 a při restartu se obnoví z YAML.
 
 Podporované algoritmy frontend dostává z backendu. `drazni_osvetleni` zapíná
-15 minut po `sunset` a vypíná 15 minut před `sunrise` z `backend/configurate/algorithms.yaml`.
+15 minut po `sunset` a vypíná 15 minut před `sunrise` z `backend/config/algorithms.yaml`.
 Při hodnotách 20:09 a 5:32 svítí od 20:24 včetně do 05:17 (v 05:17 už je vypnuté).
 Interval funguje i přes půlnoc. API neznámé algoritmy odmítá.
 Pokud je nepodporovaný algoritmus už v YAML, backend přesto nastartuje: pro tento
@@ -151,9 +151,9 @@ npm run build
   náhodná pauza 1–5 minut a rozsvícení na 20–30 sekund. První rozsvícení po
   aktivaci v noci také následuje po náhodné pauze. Při východu slunce zhasne
   i případné probíhající rozsvícení. Pauzy lze změnit v `corridor.pause_min_seconds`
-  a `corridor.pause_max_seconds` v `backend/configurate/algorithms.yaml` (výchozí 60 a 300).
+  a `corridor.pause_max_seconds` v `backend/config/algorithms.yaml` (výchozí 60 a 300).
 - `prodejna`: svítí od `shop.opening_time` včetně do `shop.closing_time`
-  v `backend/configurate/algorithms.yaml` (výchozí 07:00–19:00). Podporuje i interval přes půlnoc.
+  v `backend/config/algorithms.yaml` (výchozí 07:00–19:00). Podporuje i interval přes půlnoc.
 - `vyloha`: svítí nepřetržitě, také v noci.
 
 Východ a západ se berou z `sunrise` a `sunset`. Časové rozvrhy používají
@@ -164,7 +164,7 @@ náhodný průběh. Stav se přepočítává přibližně jednou za sekundu.
 
 ## Čas hJOP
 
-V `backend/configurate/config.yaml` je spojení s panelovým serverem hJOP:
+V `backend/config/config.yaml` je spojení s panelovým serverem hJOP:
 
 ```yaml
 hjop:
@@ -224,7 +224,7 @@ z implementace i nabídky a ve všech dodaných YAML nahrazen za `domacnost`.
 v konfiguraci. Rozvrh domácností nezávisí na východu a západu slunce.
 Ve 23:00 se cíl změní ze 40 % na 10 %, v 05:00 z 50 % na 70 %.
 
-V `backend/configurate/algorithms.yaml`:
+V `backend/config/algorithms.yaml`:
 
 ```yaml
 household:
@@ -255,7 +255,7 @@ okamžitě a časování domácnosti pro dané světlo zruší. Restart backendu
 vytvoří znovu. Před první synchronizací hJOP se domácnosti řídí systémovým časem backendu.
 
 
-Rozvrh lze měnit v `household.schedule` v `backend/configurate/algorithms.yaml`.
+Rozvrh lze měnit v `household.schedule` v `backend/config/algorithms.yaml`.
 Každá položka obsahuje `time: "HH:MM"` a `percent: 0–100`.
 Podíl platí od daného času do další položky; poslední interval pokračuje přes půlnoc
 k prvnímu času. Položky se řadí podle času automaticky, časy se nesmějí opakovat.
@@ -265,7 +265,7 @@ Například `time: "21:00", percent: 70, end_percent: 40` před položkou ve 23:
 znamená pokles ze 70 % na 40 % během dvou hodin. Ve 23:00 začne platit procento
 z nové položky (aktuálně 10 %). Změna rozvrhu vyžaduje restart backendu.
 
-Nastavení chodby je v `backend/configurate/algorithms.yaml` pod anglickým klíčem `corridor`.
+Nastavení chodby je v `backend/config/algorithms.yaml` pod anglickým klíčem `corridor`.
 `min_on_seconds` a `max_on_seconds` nastavují délku svícení (výchozí 20–30 s);
 `pause_min_seconds` a `pause_max_seconds` délku pauzy. Vše ve skutečných sekundách.
 Identifikátor algoritmu ve struktuře kolejiště zůstává `chodba`, na webu „Chodba“.
@@ -326,7 +326,7 @@ vlastní pravidla jsou ve třídách.
 
 ## Kontrola konfigurace při startu
 
-Hodnoty nastavení jsou uvedené v `backend/configurate/config.yaml` a souboru
+Hodnoty nastavení jsou uvedené v `backend/config/config.yaml` a souboru
 určeném klíčem `algorithms_file` (standardně `algorithms.yaml`). Python
 nedoplňuje náhradní hodnoty. Všechny sekce a jejich položky v dodaných souborech
 jsou povinné; výjimkou je `end_percent` u položky rozvrhu domácností, jehož

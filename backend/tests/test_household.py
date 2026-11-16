@@ -195,7 +195,7 @@ class HouseholdIntegrationTests(unittest.TestCase):
                 if "address" in node:
                     self.assertIn(node["algorithm"], SUPPORTED_ALGORITHMS)
                 visit(node.get("items", []))
-        for path in (BASE_DIR / "configurate").glob("*.yaml"):
+        for path in (BASE_DIR / "config").glob("*.yaml"):
             with self.subTest(path=path.name):
                 visit(yaml.safe_load(path.read_text(encoding="utf-8")).get("groups", []))
 

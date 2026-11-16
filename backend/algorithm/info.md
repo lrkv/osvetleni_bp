@@ -7,9 +7,9 @@ název zobrazovaný na webu; upravuje se přímo v příslušné třídě.
 
 ## Kde se nastavují
 
-- `backend/configurate/config.yaml`: soubor struktury kolejiště, připojení
+- `backend/config/config.yaml`: soubor struktury kolejiště, připojení
   serveru, MTB a hJOP. Klíč `algorithms_file` určuje soubor nastavení algoritmů.
-- `backend/configurate/algorithms.yaml`: časy východu a západu slunce, intervaly
+- `backend/config/algorithms.yaml`: časy východu a západu slunce, intervaly
   chodby a rozvrh domácností. Následující popis uvádí současné hodnoty tohoto souboru.
 - YAML se strukturou kolejiště: u každého světla klíč `algorithm` vybírá algoritmus,
   například `algorithm: domacnost`. Konkrétní soubor vybírá `layout.file`

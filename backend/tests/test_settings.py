@@ -82,11 +82,11 @@ class SettingsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             LightingService(settings)
 
-    def test_default_settings_load_from_configurate_independent_of_working_directory(self):
+    def test_default_settings_load_from_config_independent_of_working_directory(self):
         with tempfile.TemporaryDirectory() as folder:
             with patch("pathlib.Path.cwd", return_value=Path(folder)):
                 settings = load_settings()
-        self.assertEqual(Path(settings["configurate"]).parent, BASE_DIR / "configurate")
+        self.assertEqual(Path(settings["configurate"]).parent, BASE_DIR / "config")
         self.assertTrue(Path(settings["configurate"]).is_file())
         self.assertIn("sunrise", settings["light"])
         self.assertIn("household", settings["light"])

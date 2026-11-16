@@ -172,6 +172,23 @@ npm run build
 Pro sestavení jsou potřebné i vývojové závislosti, proto při této instalaci nepoužívejte `--omit=dev`.
 Výsledek je ve složce `frontend/.output`.
 
+Alternativně lze vytvořit statické soubory bez Node.js serveru při provozu:
+
+```sh
+npm run generate
+```
+
+Na statický webový server se kopíruje obsah `frontend/.output/public`.
+Podstránky `/mapa` a `/udalosti` mají vlastní `index.html`; server musí umět
+adresářové indexy. Backend se spouští samostatně i při této variantě.
+Pro spuštění příkazem `node .output/server/index.mjs` v následující kapitole
+použijte variantu `npm run build`.
+
+Podporované verze Node.js určuje `frontend/package.json`; doporučenou řadu
+24 vybírá také `frontend/.nvmrc`. `frontend/.npmrc` zapíná kontrolu kompatibility
+už při instalaci (`EBADENGINE` znamená nepodporovanou verzi Node.js).
+
+
 Pokud na Windows sestavení skončí chybou `EPERM`, zkuste v témže terminálu:
 
 ```powershell
@@ -351,3 +368,38 @@ Kontrolují se také porty, kladné časové limity, intervaly a denní rozvrhy.
 Starší sloučená konfigurace s klíči `light` nebo `configurate` a českou sekcí
 `chodba` se již nenačítá; použijte aktuální rozdělené soubory.
 Ani při `hjop.enabled: false` nevynechávejte ostatní položky sekce `hjop`.
+
+
+## Ověření na 64bitovém Raspberry Pi
+
+Cílem je Linux ARM64 (`uname -m` vypíše `aarch64`), například 64bitový Raspberry
+Pi OS. Použijte Node.js řady 24 od 24.11 a Python 3.11 nebo novější.
+Pro vytvoření testovacího prostředí musí být dostupné `venv` a pip; v Raspberry
+Pi OS je případně doplní správce příkazem `sudo apt install python3-venv python3-pip`.
+
+Z kořenové složky projektu spusťte:
+
+```sh
+python3 scripts/verify_linux.py --require-arm64
+```
+
+Skript vytvoří dočasnou čistou kopii projektu. Nainstaluje Python závislosti,
+spustí backendové testy, provede `npm ci`, frontendové testy, `npm run generate`
+a `npm run build`. Ověří HTTP odpovědi hlavní stránky, mapy, událostí a souboru
+adresy backendu jak ze statických souborů, tak ze spuštěného Node.js serveru.
+Produkční backend ani spojení na skutečný MTB nebo hJOP nespouští.
+Dočasné soubory po skončení uklidí; běžící instalaci nepřepisuje.
+Test potřebuje síť pro stažení balíčků, volné místo a paměť pro sestavení.
+Pokud sestavení skončí pouze zprávou `Killed`, zkontrolujte nedostatek paměti
+v systémovém logu; samotná zpráva tuto příčinu ještě nepotvrzuje.
+
+V repozitáři je také workflow `.github/workflows/linux.yml`, které stejný test
+spouští na Linuxu x64 a ARM64 po nahrání změn na GitHub. ARM64 runner ověří
+architekturu, ale nenahrazuje ověření paměti, výkonu a připojeného hardwaru
+konkrétního Raspberry Pi. Dokud workflow skutečně neproběhne, nejde o potvrzený
+test na Linuxu.
+
+Nekopírujte `node_modules` z Windows na Raspberry Pi. Závislosti se instalují
+přímo na cílovém systému příkazem `npm ci`, který vybere příslušné nativní balíčky.
+U statického nasazení lze naopak přenést pouze hotový obsah `.output/public`;
+pro jeho obsluhu už Node.js ani nativní sestavovací závislosti nejsou potřeba.

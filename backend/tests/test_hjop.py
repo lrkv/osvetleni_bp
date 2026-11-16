@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_manager, make_hjop
 from hjop import HjopClock
 from service import LatestUpdates, LightingService
 from configurate import load_settings, ConfigManager
@@ -14,7 +15,7 @@ from configurate import load_settings, ConfigManager
 
 class LayoutTests(unittest.TestCase):
     def test_legacy_address_is_normalized_and_can_change(self):
-        manager = ConfigManager()
+        manager = make_manager()
         light = {"name": "Test", "adress": "1:0", "algorithm": "trvale_vypnuto"}
         with self.assertLogs("configurate", level="WARNING"):
             manager._process_item(light)
@@ -49,7 +50,7 @@ class LayoutTests(unittest.TestCase):
 
 class ClockTests(unittest.TestCase):
     def test_speed_pause_and_freeze(self):
-        clock = HjopClock()
+        clock = make_hjop()
         clock.connected = True
         with patch("hjop.monotonic", return_value=10) as timer:
             clock.apply_time("-;MOD-CAS;1;9;2:25:21;1".split(";"))
@@ -68,7 +69,7 @@ class ClockTests(unittest.TestCase):
             self.assertFalse(clock.status()["available"])
 
     def test_midnight_sync_keeps_model_date(self):
-        clock = HjopClock()
+        clock = make_hjop()
         clock.connected = True
         with patch("hjop.monotonic", return_value=0) as timer:
             clock.apply_time("-;MOD-CAS;1;9;23:59:55;1".split(";"))
@@ -79,7 +80,7 @@ class ClockTests(unittest.TestCase):
             self.assertEqual((clock.now().date() - before.date()).days, 1)
 
     def test_unavailable_and_invalid_messages(self):
-        clock = HjopClock()
+        clock = make_hjop()
         self.assertIsNone(clock.now())
         self.assertFalse(clock.status()["available"])
         for message in ("-;MOD-CAS;1;nan;12:00:00;1", "-;MOD-CAS;1;-1;12:00:00;1",
@@ -94,7 +95,7 @@ class ClockTests(unittest.TestCase):
     def test_algorithm_uses_model_time_and_static_modes_work_before_sync(self, system_time):
         system_time.now.return_value = datetime(2026, 10, 30, 22, 0)
         settings = load_settings()
-        settings["hjop"] = {"enabled": True}
+        settings["hjop"]["enabled"] = True
         settings["configurate"] = "lrkv_tt.yaml"
         service = LightingService(settings)
         service.manager.items_by_id = {
@@ -117,7 +118,7 @@ class ClockTests(unittest.TestCase):
     def test_clock_selection_fallback_recovery_and_pause(self, system_time):
         system_time.now.return_value = datetime(2026, 10, 30, 12, 1, 10)
         settings = load_settings()
-        settings["hjop"] = {"enabled": True}
+        settings["hjop"]["enabled"] = True
         service = LightingService(settings)
         service.manager.items_by_id = {
             1: {"id": 1, "name": "Minute", "address": "1:0", "algorithm": "minuta"},
@@ -154,7 +155,7 @@ class ClockTests(unittest.TestCase):
 
     def test_corridor_durations_stay_real_seconds(self):
         settings = load_settings()
-        settings["hjop"] = {"enabled": True}
+        settings["hjop"]["enabled"] = True
         settings["configurate"] = "lrkv_tt.yaml"
         service = LightingService(settings)
         service.manager.items_by_id = {
@@ -220,7 +221,7 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
                 handlers.discard(asyncio.current_task())
 
         server = await asyncio.start_server(peer, "127.0.0.1", 0)
-        clock = HjopClock(host="127.0.0.1", port=server.sockets[0].getsockname()[1], timeout=1, reconnect_delay=0.02)
+        clock = make_hjop(host="127.0.0.1", port=server.sockets[0].getsockname()[1], timeout=1, reconnect_delay=0.02)
         task = asyncio.create_task(clock.run())
         try:
             async with asyncio.timeout(3):
@@ -254,7 +255,7 @@ class TransportTests(unittest.IsolatedAsyncioTestCase):
                 handlers.discard(asyncio.current_task())
 
         server = await asyncio.start_server(peer, "127.0.0.1", 0)
-        clock = HjopClock(host="127.0.0.1", port=server.sockets[0].getsockname()[1], timeout=0.05, reconnect_delay=0.02)
+        clock = make_hjop(host="127.0.0.1", port=server.sockets[0].getsockname()[1], timeout=0.05, reconnect_delay=0.02)
         task = asyncio.create_task(clock.run())
         try:
             async with asyncio.timeout(2):

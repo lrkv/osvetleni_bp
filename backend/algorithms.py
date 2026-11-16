@@ -14,5 +14,7 @@ def evaluate_algorithm(algorithm_name, sunrise_str="00:00", sunset_str="00:00", 
         if household_output is None:
             raise ValueError("Domácnosti musí vyhodnotit společný správce HouseholdLighting.")
         return household_output
-    instance = corridor if corridor is not None else cls()
+    from configurate import ConfigManager, load_settings
+    manager = ConfigManager.from_settings(load_settings()["light"])
+    instance = corridor if corridor is not None else manager.algorithm_for({"id": 0, "algorithm": algorithm_name})
     return instance.compute(now if now is not None else datetime.now(), sunrise_str, sunset_str)

@@ -5,22 +5,9 @@ from datetime import datetime, timedelta
 from time import monotonic
 from .base import Algorithm, Change
 
-# Záloha pro starší konfigurace bez household.schedule.
-DEFAULT_HOUSEHOLD_SCHEDULE = (
-    {"time": "04:00", "percent": 10, "end_percent": 50},
-    {"time": "05:00", "percent": 70},
-    {"time": "06:00", "percent": 50},
-    {"time": "08:00", "percent": 5},
-    {"time": "19:00", "percent": 70},
-    {"time": "21:00", "percent": 70, "end_percent": 40},
-    {"time": "23:00", "percent": 10},
-)
-
-
 class HouseholdSchedule:
     """Daily cyclic intervals; optional end_percent makes an interval linear."""
-    def __init__(self, entries=None):
-        entries = DEFAULT_HOUSEHOLD_SCHEDULE if entries is None else entries
+    def __init__(self, entries):
         if not isinstance(entries, (list, tuple)) or not entries:
             raise ValueError("household.schedule musí být neprázdný seznam.")
         self.points = []
@@ -64,9 +51,8 @@ class HouseholdSchedule:
         return (percent + (end_percent - percent) * elapsed / duration) / 100
 
 
-def household_ratio(now: datetime) -> float:
-    """Default schedule, retained for callers without explicit configuration."""
-    return HouseholdSchedule().ratio(now)
+def household_ratio(now: datetime, schedule) -> float:
+    return HouseholdSchedule(schedule).ratio(now)
 
 
 @dataclass
@@ -86,7 +72,7 @@ class HouseholdLighting(Algorithm):
     def name() -> str:
         return "Domácnost"
 
-    def __init__(self, min_on_seconds=30, max_on_seconds=300, min_off_seconds=30, schedule=None):
+    def __init__(self, min_on_seconds, max_on_seconds, min_off_seconds, schedule):
         try:
             limits = tuple(float(value) for value in (min_on_seconds, max_on_seconds, min_off_seconds))
         except (TypeError, ValueError):

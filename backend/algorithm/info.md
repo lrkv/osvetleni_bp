@@ -15,6 +15,10 @@ název zobrazovaný na webu; upravuje se přímo v příslušné třídě.
   například `algorithm: domacnost`. Konkrétní soubor vybírá `layout.file`
   v `config.yaml`.
 
+Konfigurační hodnoty jsou povinné; Python nedoplňuje náhradní nastavení.
+Chybějící nebo neznámá položka způsobí chybu při startu s názvem položky.
+`end_percent` v rozvrhu domácností je volitelné: bez něj je podíl konstantní.
+
 Po změně YAML souborů restartujte backend. Změna algoritmu přes web se projeví
 za běhu; nepřepisuje uloženou YAML konfiguraci.
 
@@ -101,7 +105,7 @@ household:
 
 Časy musí být unikátní a rozvrh nesmí být prázdný. Procenta musí být v rozsahu
 0–100. Délky musí být kladné a minimum svícení nesmí překročit maximum.
-Bez uvedeného `schedule` se použije rozvrh zabudovaný v `household.py`.
+`schedule` je povinné. Při chybějícím nebo chybném nastavení se backend nespustí.
 
 Současný úplný rozvrh:
 
@@ -178,7 +182,7 @@ shop:
 - `opening_time`: čas rozsvícení ve formátu `HH:MM`.
 - `closing_time`: čas zhasnutí ve formátu `HH:MM`.
 
-Bez nastavení se použije 07:00–19:00. Časy musí být různé a v rozsahu
+Oba časy jsou povinné. V dodané konfiguraci jsou 07:00 a 19:00. Musí být různé a v rozsahu
 00:00–23:59. Pokud je zavírací čas dřívější než otevírací, interval pokračuje
 přes půlnoc (například 22:00–02:00). Stejné nastavení platí i pro budoucí události.
 Po změně souboru restartujte backend.

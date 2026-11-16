@@ -4,6 +4,7 @@ from datetime import datetime
 
 import yaml
 from functools import partial
+from settings_validation import mapping, validate_settings, validate_light
 from algorithm import ALGORITHMS, CorridorLighting, HouseholdLighting, Shop
 
 logger = logging.getLogger(__name__)
@@ -26,20 +27,19 @@ def load_settings(file_source=None):
         return value
 
     data = read_mapping(path)
-    if "algorithms_file" in data:
-        if "light" in data:
-            raise ValueError("Použijte algorithms_file, nebo původní light, nikoli obojí.")
-        data["light"] = read_mapping(path.parent / data["algorithms_file"])
-    if "layout" in data:
-        if "configurate" in data:
-            raise ValueError("Použijte layout.file, nebo původní configurate, nikoli obojí.")
-        data["configurate"] = str((path.parent / data["layout"]["file"]).resolve())
-    # Keep accepting older single-file configurations.
-    light = data.get("light", {})
-    if "chodba" in light:
-        if "corridor" in light:
-            raise ValueError("Nastavení chodby je uvedeno dvakrát; použijte corridor.")
-        light["corridor"] = light.pop("chodba")
+    mapping(data, ('layout', 'algorithms_file', 'server', 'mtb', 'hjop'), str(path))
+    mapping(data['layout'], ('file',), 'layout')
+    from settings_validation import text
+    text(data['layout']['file'], 'layout.file')
+    text(data['algorithms_file'], 'algorithms_file')
+    algorithms_path = path.parent / data.pop('algorithms_file')
+    light = read_mapping(algorithms_path)
+    data['configurate'] = str((path.parent / data.pop('layout')['file']).resolve())
+    data['light'] = light
+    try:
+        validate_settings(data)
+    except ValueError as exc:
+        raise ValueError(f"Konfigurace {path} / {algorithms_path}: {exc}") from exc
     return data
 
 
@@ -49,10 +49,10 @@ def load_configuration(file_source=None):
 
 
 class ConfigManager:
-    def __init__(self, corridor_pause_min=60, corridor_pause_max=300, *,
-                 corridor_min_on_seconds=20, corridor_max_on_seconds=30,
-                 household_min_on_seconds=30, household_max_on_seconds=300, household_min_off_seconds=30, household_schedule=None,
-                 shop_opening_time="07:00", shop_closing_time="19:00"):
+    def __init__(self, corridor_pause_min, corridor_pause_max, *,
+                 corridor_min_on_seconds, corridor_max_on_seconds,
+                 household_min_on_seconds, household_max_on_seconds, household_min_off_seconds, household_schedule,
+                 shop_opening_time, shop_closing_time):
         # Validate once, before any background task is started.
         CorridorLighting(corridor_pause_min, corridor_pause_max, corridor_min_on_seconds, corridor_max_on_seconds)
         self.corridor_min_on_seconds = corridor_min_on_seconds
@@ -75,6 +75,19 @@ class ConfigManager:
         self.tree_data = {}             # Stromová struktura pro web
         self.items_by_id = {}           # Plochý slovník pro rychlé hledání prvků podle ID
         self.next_id = 1                # Počítadlo pro generování unikátních ID
+
+    @classmethod
+    def from_settings(cls, light):
+        validate_light(light)
+        corridor, household, shop = light['corridor'], light['household'], light['shop']
+        return cls(corridor['pause_min_seconds'], corridor['pause_max_seconds'],
+                   corridor_min_on_seconds=corridor['min_on_seconds'],
+                   corridor_max_on_seconds=corridor['max_on_seconds'],
+                   household_min_on_seconds=household['min_on_seconds'],
+                   household_max_on_seconds=household['max_on_seconds'],
+                   household_min_off_seconds=household['min_off_seconds'],
+                   household_schedule=household['schedule'],
+                   shop_opening_time=shop['opening_time'], shop_closing_time=shop['closing_time'])
 
     def _generate_id(self):
         current_id = self.next_id

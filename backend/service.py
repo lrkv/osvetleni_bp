@@ -8,6 +8,7 @@ from mtb import DaemonClient
 from hjop import HjopClock
 from algorithm import ALGORITHM_LABELS
 from events import upcoming_events
+from settings_validation import validate_settings
 
 logger = logging.getLogger(__name__)
 
@@ -43,21 +44,8 @@ class LatestUpdates:
 
 class LightingService:
     def __init__(self, settings):
-        corridor = settings["light"].get("corridor", {})
-        household = settings["light"].get("household", {})
-        shop = settings["light"].get("shop", {})
-        self.manager = ConfigManager(
-            corridor_pause_min=corridor.get("pause_min_seconds", 60),
-            corridor_pause_max=corridor.get("pause_max_seconds", 300),
-            corridor_min_on_seconds=corridor.get("min_on_seconds", 20),
-            corridor_max_on_seconds=corridor.get("max_on_seconds", 30),
-            household_min_on_seconds=household.get("min_on_seconds", 30),
-            household_max_on_seconds=household.get("max_on_seconds", 300),
-            household_min_off_seconds=household.get("min_off_seconds", 30),
-            household_schedule=household.get("schedule"),
-            shop_opening_time=shop.get("opening_time", "07:00"),
-            shop_closing_time=shop.get("closing_time", "19:00"),
-        )
+        validate_settings(settings)
+        self.manager = ConfigManager.from_settings(settings['light'])
         self.manager.load_yaml(BASE_DIR / "configurate" / settings["configurate"])
         self.sunrise = str(settings["light"]["sunrise"])
         self.sunset = str(settings["light"]["sunset"])
@@ -66,21 +54,21 @@ class LightingService:
         self.clock_snapshot = ""
         self.events_snapshot = ""
         self.tasks = []
-        hjop = settings.get("hjop", {})
-        self.use_hjop = hjop.get("enabled", True)
+        hjop = settings["hjop"]
+        self.use_hjop = hjop["enabled"]
         self.model_clock = HjopClock(
-            hjop.get("host", "localhost"), hjop.get("port", 5896),
-            timeout=hjop.get("timeout", 5),
-            reconnect_delay=hjop.get("reconnect_delay", 3),
-            idle_timeout=hjop.get("idle_timeout", 20),
-            sync_timeout=hjop.get("sync_timeout", 240),
+            hjop["host"], hjop["port"],
+            timeout=hjop["timeout"],
+            reconnect_delay=hjop["reconnect_delay"],
+            idle_timeout=hjop["idle_timeout"],
+            sync_timeout=hjop["sync_timeout"],
             on_change=self.recalculate,
         )
-        mtb = settings.get("mtb", {})
+        mtb = settings["mtb"]
         self.daemon = DaemonClient(
-            mtb.get("host", "127.0.0.1"), int(mtb.get("port", 3841)),
-            timeout=float(mtb.get("timeout", 5)),
-            reconnect_delay=float(mtb.get("reconnect_delay", 3)),
+            mtb["host"], int(mtb["port"]),
+            timeout=float(mtb["timeout"]),
+            reconnect_delay=float(mtb["reconnect_delay"]),
             on_change=self.publish,
         )
 

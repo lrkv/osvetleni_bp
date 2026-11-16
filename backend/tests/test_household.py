@@ -9,6 +9,7 @@ from unittest.mock import patch
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_manager, make_household, configured_ratio
 from algorithms import ALGORITHM_LABELS, HouseholdLighting, HouseholdSchedule, household_ratio
 from configurate import BASE_DIR, ConfigManager, SUPPORTED_ALGORITHMS, load_settings
 from service import LightingService
@@ -37,20 +38,20 @@ class HouseholdTests(unittest.TestCase):
         }
         for time, ratio in cases.items():
             with self.subTest(time=time):
-                self.assertAlmostEqual(household_ratio(instant(time)), ratio)
+                self.assertAlmostEqual(configured_ratio(instant(time)), ratio)
 
     def test_target_counts_and_nearest_integer_rounding(self):
         for time, expected in (("19:00:00", 14), ("22:00:00", 11), ("23:00:00", 2),
                                ("04:30:00", 6), ("05:00:00", 14), ("06:00:00", 10),
                                ("08:00:00", 1)):
             with self.subTest(time=time):
-                self.assertEqual(sum(evaluate(HouseholdLighting(), 0, time, range(20)).values()), expected)
-        self.assertEqual(sum(evaluate(HouseholdLighting(), 0, "12:00:00", range(13)).values()), 1)
-        self.assertEqual(sum(evaluate(HouseholdLighting(), 0, "12:00:00", range(3)).values()), 0)
-        self.assertEqual(evaluate(HouseholdLighting(), 0, members=[]), {})
+                self.assertEqual(sum(evaluate(make_household(), 0, time, range(20)).values()), expected)
+        self.assertEqual(sum(evaluate(make_household(), 0, "12:00:00", range(13)).values()), 1)
+        self.assertEqual(sum(evaluate(make_household(), 0, "12:00:00", range(3)).values()), 0)
+        self.assertEqual(evaluate(make_household(), 0, members=[]), {})
 
     def test_minimum_survives_model_time_jump_and_maximum_uses_real_time(self):
-        controller = HouseholdLighting()
+        controller = make_household()
         with patch("algorithm.household.random.uniform", return_value=300):
             initial = evaluate(controller, 0)
             self.assertEqual(sum(initial.values()), 7)
@@ -64,7 +65,7 @@ class HouseholdTests(unittest.TestCase):
             self.assertEqual(evaluate(controller, 329, "12:00:00")[survivor], 0)
 
     def test_rotation_and_minimum_off_time_even_with_paused_model_clock(self):
-        controller = HouseholdLighting(30, 30, 30)
+        controller = make_household(30, 30, 30)
         first = evaluate(controller, 0)
         self.assertEqual(evaluate(controller, 29), first)
         second = evaluate(controller, 30)
@@ -77,7 +78,7 @@ class HouseholdTests(unittest.TestCase):
         self.assertTrue(all(not third[key] for key, value in second.items() if value))
 
     def test_random_duration_is_drawn_once_per_on_period(self):
-        controller = HouseholdLighting(45, 90, 30)
+        controller = make_household(45, 90, 30)
         with patch("algorithm.household.random.uniform", return_value=60) as rng:
             first = evaluate(controller, 0)
             self.assertEqual(rng.call_count, 7)
@@ -89,7 +90,7 @@ class HouseholdTests(unittest.TestCase):
             self.assertTrue(all(not next_state[key] for key, value in first.items() if value))
 
     def test_no_clock_and_membership_changes(self):
-        controller = HouseholdLighting()
+        controller = make_household()
         self.assertEqual(sum(evaluate(controller, 0, time=None).values()), 0)
         with patch("algorithm.household.random.uniform", return_value=300):
             first = evaluate(controller, 1)
@@ -106,10 +107,10 @@ class HouseholdTests(unittest.TestCase):
         for limits in ((0, 300, 30), (301, 300, 30), (30, 300, 0),
                        (30, float("inf"), 30), (float("nan"), 300, 30), ("bad", 300, 30)):
             with self.subTest(limits=limits), self.assertRaises(ValueError):
-                HouseholdLighting(*limits)
+                make_household(*limits)
 
     def test_simulated_run_respects_every_real_on_and_off_interval(self):
-        controller = HouseholdLighting()
+        controller = make_household()
         rng = random.Random(126)
         last = dict.fromkeys(range(20), 0)
         changed_at = dict.fromkeys(range(20), -1000)
@@ -139,7 +140,7 @@ class HouseholdIntegrationTests(unittest.TestCase):
     def test_all_groups_and_modules_share_one_target_and_publish_state(self):
         settings = load_settings()
         settings["configurate"] = "lrkv_tt.yaml"
-        settings["light"]["household"] = {"min_on_seconds": 45, "max_on_seconds": 90, "min_off_seconds": 35}
+        settings["light"]["household"].update({"min_on_seconds": 45, "max_on_seconds": 90, "min_off_seconds": 35})
         service = LightingService(settings)
         manager = service.manager
         # Four independent groups, ten modules: percentage must be global.
@@ -169,7 +170,7 @@ class HouseholdIntegrationTests(unittest.TestCase):
         self.assertEqual(snapshot["algorithm_labels"]["domacnost"], "Domácnost")
 
     def test_reselect_keeps_state_but_manual_mode_change_resets_it(self):
-        manager = ConfigManager()
+        manager = make_manager()
         for index in range(10):
             manager._process_item({"name": str(index), "address": f"1:{index}", "algorithm": "domacnost"})
         with patch("algorithm.household.monotonic", return_value=0), patch("algorithm.household.random.uniform", return_value=300):
@@ -239,7 +240,7 @@ class ConfigurableScheduleTests(unittest.TestCase):
         for hour in range(24):
             for minute in range(60):
                 now = datetime(2026, 10, 26, hour, minute)
-                self.assertAlmostEqual(schedule.ratio(now), household_ratio(now))
+                self.assertAlmostEqual(schedule.ratio(now), configured_ratio(now))
 
     def test_custom_yaml_schedule_reaches_output_calculation(self):
         settings = load_settings()

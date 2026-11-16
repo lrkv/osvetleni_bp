@@ -4,8 +4,9 @@ from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_manager
 from algorithm import Algorithm, ALGORITHMS, ALGORITHM_LABELS
-from configurate import ConfigManager
+from configurate import ConfigManager, load_settings
 
 
 class AlgorithmClassTests(unittest.TestCase):
@@ -15,7 +16,7 @@ class AlgorithmClassTests(unittest.TestCase):
         self.assertEqual(len({cls.__module__ for cls in ALGORITHMS.values()}), len(ALGORITHMS))
         for identifier, cls in ALGORITHMS.items():
             with self.subTest(identifier=identifier):
-                instance = cls()
+                instance = ConfigManager.from_settings(load_settings()["light"]).algorithm_for({"id": 1, "algorithm": identifier})
                 self.assertIsInstance(instance, Algorithm)
                 self.assertEqual(instance.identifier, identifier)
                 self.assertEqual(ALGORITHM_LABELS[identifier], instance.name())
@@ -33,14 +34,14 @@ class AlgorithmClassTests(unittest.TestCase):
             def compute(self, now, sunrise, sunset, *, item_id=None) -> int:
                 return int(now.hour == 12 and item_id == 1)
 
-        manager = ConfigManager()
+        manager = make_manager()
         manager._factories[TestAlgorithm.identifier] = TestAlgorithm
         manager._process_item({"name": "Test", "address": "1:0", "algorithm": "test"})
         self.assertEqual(manager.calculate_outputs("06:00", "20:00", now=datetime(2026, 1, 1, 12)), {1: {0: 1}})
         self.assertEqual(manager.calculate_outputs("06:00", "20:00", now=datetime(2026, 1, 1, 13)), {1: {0: 0}})
 
     def test_corridors_have_separate_instances_and_households_share_coordinator(self):
-        manager = ConfigManager()
+        manager = make_manager()
         for index, identifier in enumerate(("chodba", "chodba", "domacnost", "domacnost")):
             manager._process_item({"name": str(index), "address": f"1:{index}", "algorithm": identifier})
         instances = [manager.algorithm_for(item) for item in manager.items_by_id.values()]

@@ -322,3 +322,21 @@ Domácnosti používají jednu společnou instanci (`shared = True`), aby se pod
 počítal přes všechna světla. Chodby mají každá svou instanci a časovač.
 `backend/algorithms.py` slouží pouze jako kompatibilní rozhraní pro starší volání;
 vlastní pravidla jsou ve třídách.
+
+
+## Kontrola konfigurace při startu
+
+Hodnoty nastavení jsou uvedené v `backend/configurate/config.yaml` a souboru
+určeném klíčem `algorithms_file` (standardně `algorithms.yaml`). Python
+nedoplňuje náhradní hodnoty. Všechny sekce a jejich položky v dodaných souborech
+jsou povinné; výjimkou je `end_percent` u položky rozvrhu domácností, jehož
+vynechání znamená konstantní podíl. `server.allowed_origin_regex` lze výslovně
+nastavit na `null`, aby se použil pouze seznam `allowed_origins`.
+
+Při chybějící hodnotě, neznámém názvu položky nebo neplatném typu se backend
+nespustí a chyba uvede příslušnou položku. Například překlep
+`pause_min_second` místo `pause_min_seconds` vyvolá chybu konfigurace.
+Kontrolují se také porty, kladné časové limity, intervaly a denní rozvrhy.
+Starší sloučená konfigurace s klíči `light` nebo `configurate` a českou sekcí
+`chodba` se již nenačítá; použijte aktuální rozdělené soubory.
+Ani při `hjop.enabled: false` nevynechávejte ostatní položky sekce `hjop`.

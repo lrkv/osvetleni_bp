@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_manager, make_corridor
 from algorithms import CorridorLighting, evaluate_algorithm
 from configurate import ConfigManager, SUPPORTED_ALGORITHMS, load_settings
 from service import LightingService
@@ -45,7 +46,7 @@ class CorridorTests(unittest.TestCase):
             return state.evaluate(datetime.fromisoformat(instant), "5:32", "20:09")
 
     def test_random_intervals_are_stable_between_recalculations(self):
-        state = CorridorLighting()
+        state = make_corridor()
         with patch("algorithm.corridor.random.randint", side_effect=[60, 20, 300, 30, 60]) as rng:
             self.assertEqual(self.evaluate(state, 0), 0)
             self.assertEqual(self.evaluate(state, 59.99), 0)
@@ -61,7 +62,7 @@ class CorridorTests(unittest.TestCase):
                              [(60, 300), (20, 30), (60, 300), (20, 30), (60, 300)])
 
     def test_dawn_cuts_off_light_and_new_night_starts_new_schedule(self):
-        state = CorridorLighting()
+        state = make_corridor()
         with patch("algorithm.corridor.random.randint", side_effect=[60, 30, 120]) as rng:
             self.assertEqual(self.evaluate(state, 0), 0)
             self.assertEqual(self.evaluate(state, 60, "2026-10-26T05:31:59"), 1)
@@ -73,7 +74,7 @@ class CorridorTests(unittest.TestCase):
             self.assertEqual(state.deadline, 320)
 
     def test_midnight_does_not_reset_light(self):
-        state = CorridorLighting()
+        state = make_corridor()
         with patch("algorithm.corridor.random.randint", side_effect=[60, 30]) as rng:
             self.evaluate(state, 0, "2026-10-25T23:58:55")
             self.assertEqual(self.evaluate(state, 60, "2026-10-25T23:59:55"), 1)
@@ -82,12 +83,12 @@ class CorridorTests(unittest.TestCase):
 
     def test_daytime_never_draws_random_numbers(self):
         with patch("algorithm.corridor.random.randint") as rng:
-            self.assertEqual(self.evaluate(CorridorLighting(), 0, "2026-10-25T12:00:00"), 0)
-            self.assertEqual(self.evaluate(CorridorLighting(), 0, "2026-10-25T20:08:59"), 0)
+            self.assertEqual(self.evaluate(make_corridor(), 0, "2026-10-25T12:00:00"), 0)
+            self.assertEqual(self.evaluate(make_corridor(), 0, "2026-10-25T20:08:59"), 0)
             rng.assert_not_called()
 
     def test_each_light_is_independent_and_mode_changes_reset_state(self):
-        manager = ConfigManager()
+        manager = make_manager()
         manager.items_by_id = {
             1: {"id": 1, "name": "A", "address": "1:0", "algorithm": "chodba"},
             2: {"id": 2, "name": "B", "address": "1:1", "algorithm": "chodba"},
@@ -113,13 +114,13 @@ class CorridorTests(unittest.TestCase):
 
     def test_pause_range_is_configurable_and_validated(self):
         settings = load_settings()
-        settings["light"]["corridor"] = {"pause_min_seconds": 90, "pause_max_seconds": 180}
+        settings["light"]["corridor"].update({"pause_min_seconds": 90, "pause_max_seconds": 180})
         service = LightingService(settings)
         self.assertEqual(service.manager.corridor_pause_min, 90)
         self.assertEqual(service.manager.corridor_pause_max, 180)
         for limits in ((0, 10), (60, 30), (-1, 30)):
             with self.assertRaises(ValueError):
-                ConfigManager(*limits)
+                make_manager(*limits)
 
 
 if __name__ == "__main__":

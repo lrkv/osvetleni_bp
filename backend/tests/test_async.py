@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_daemon
 from configurate import load_settings
 from mtb import DaemonClient
 from service import LightingService
@@ -16,7 +17,7 @@ from service import LightingService
 def fixture_settings(layout="lrkv_tt.yaml"):
     settings = load_settings()
     settings["configurate"] = layout
-    settings["hjop"] = {"enabled": False}
+    settings["hjop"]["enabled"] = False
     return settings
 
 
@@ -57,7 +58,7 @@ class DaemonTests(unittest.IsolatedAsyncioTestCase):
 
         self.server = await asyncio.start_server(peer, "127.0.0.1", 0)
         port = self.server.sockets[0].getsockname()[1]
-        self.client = DaemonClient(port=port, timeout=0.4, reconnect_delay=0.04)
+        self.client = make_daemon(port=port, timeout=0.4, reconnect_delay=0.04)
         self.task = asyncio.create_task(self.client.run())
         self.reader, self.writer = await asyncio.wait_for(self.connections.get(), 2)
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_manager
 from algorithms import evaluate_algorithm, parse_time_to_datetime
 from configurate import ConfigManager, SUPPORTED_ALGORITHMS, load_settings
 
@@ -58,7 +59,7 @@ class RailwayLightingTests(unittest.TestCase):
     def test_manager_uses_config_times_and_accepts_algorithm(self):
         settings = load_settings()
         sunrise, sunset = str(settings["light"]["sunrise"]), str(settings["light"]["sunset"])
-        manager = ConfigManager()
+        manager = make_manager()
         item = {"id": 1, "name": "Peron 1", "address": "1:2", "algorithm": "trvale_vypnuto"}
         manager.items_by_id = {1: item}
         self.assertIn("drazni_osvetleni", SUPPORTED_ALGORITHMS)

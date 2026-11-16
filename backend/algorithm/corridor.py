@@ -14,7 +14,7 @@ class CorridorLighting(Algorithm):
     def name() -> str:
         return "Chodba"
 
-    def __init__(self, pause_min_seconds=60, pause_max_seconds=300, min_on_seconds=20, max_on_seconds=30):
+    def __init__(self, pause_min_seconds, pause_max_seconds, min_on_seconds, max_on_seconds):
         values = (pause_min_seconds, pause_max_seconds, min_on_seconds, max_on_seconds)
         if (any(isinstance(value, bool) or not isinstance(value, int) or value <= 0 for value in values)
                 or pause_min_seconds > pause_max_seconds or min_on_seconds > max_on_seconds):

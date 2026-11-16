@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from configurate import SUPPORTED_ALGORITHMS, load_settings
 from service import LightingService
+from settings_validation import validate_settings
 
 
 class UpdateRequest(BaseModel):
@@ -17,9 +18,10 @@ class UpdateRequest(BaseModel):
 
 def create_app(settings=None):
     settings = settings if settings is not None else load_settings()
-    server = settings.get("server", {})
-    origins = server.get("allowed_origins", ["http://localhost:3000", "http://127.0.0.1:3000"])
-    origin_regex = server.get("allowed_origin_regex")
+    validate_settings(settings)
+    server = settings["server"]
+    origins = server["allowed_origins"]
+    origin_regex = server["allowed_origin_regex"]
 
     @asynccontextmanager
     async def lifespan(app):

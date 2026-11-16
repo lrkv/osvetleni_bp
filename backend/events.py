@@ -7,8 +7,9 @@ from algorithm import ALGORITHMS
 
 
 def fixed_changes(algorithm, now, sunrise, sunset):
-    cls = ALGORITHMS.get(algorithm)
-    return cls().fixed_changes(now, sunrise, sunset) if cls else []
+    from configurate import ConfigManager, load_settings
+    instance = ConfigManager.from_settings(load_settings()["light"]).algorithm_for({"id": 0, "algorithm": algorithm})
+    return instance.fixed_changes(now, sunrise, sunset) if instance else []
 
 
 def upcoming_events(manager, sunrise, sunset, now, status, real_now):

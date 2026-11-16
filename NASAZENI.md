@@ -333,3 +333,21 @@ Dostupnost MTB Daemona, hJOP, případných ovladačů a hardwaru řešte pro da
 | Port je již obsazený | Zda už neběží druhá instance; ukončete ji nebo zvolte jiný port. |
 | Po změně nastavení se nic nezměnilo | Backendové YAML vyžadují restart. Adresu backendu měňte také v nasazené kopii JSON a obnovte stránku. |
 | `npm ci` hlásí nepodporovaný Node.js | Ověřte verzi; použijte například řadu Node.js 24 od 24.11. |
+
+
+## Kontrola konfigurace při startu
+
+Hodnoty nastavení jsou uvedené v `backend/configurate/config.yaml` a souboru
+určeném klíčem `algorithms_file` (standardně `algorithms.yaml`). Python
+nedoplňuje náhradní hodnoty. Všechny sekce a jejich položky v dodaných souborech
+jsou povinné; výjimkou je `end_percent` u položky rozvrhu domácností, jehož
+vynechání znamená konstantní podíl. `server.allowed_origin_regex` lze výslovně
+nastavit na `null`, aby se použil pouze seznam `allowed_origins`.
+
+Při chybějící hodnotě, neznámém názvu položky nebo neplatném typu se backend
+nespustí a chyba uvede příslušnou položku. Například překlep
+`pause_min_second` místo `pause_min_seconds` vyvolá chybu konfigurace.
+Kontrolují se také porty, kladné časové limity, intervaly a denní rozvrhy.
+Starší sloučená konfigurace s klíči `light` nebo `configurate` a českou sekcí
+`chodba` se již nenačítá; použijte aktuální rozdělené soubory.
+Ani při `hjop.enabled: false` nevynechávejte ostatní položky sekce `hjop`.

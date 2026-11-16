@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class DaemonClient:
-    def __init__(self, host="127.0.0.1", port=3841, *, timeout=5.0,
-                 reconnect_delay=3.0, on_change=None):
+    def __init__(self, host, port, *, timeout,
+                 reconnect_delay, on_change=None):
         if timeout <= 0 or reconnect_delay <= 0:
             raise ValueError("MTB timeout a reconnect_delay musí být kladné.")
         self.host, self.port = host, port

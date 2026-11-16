@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from config_fixtures import make_manager, make_corridor
 from algorithms import CorridorLighting, _HouseholdState
 from configurate import ConfigManager, load_settings
 from events import upcoming_events, fixed_changes
@@ -16,7 +17,7 @@ STATUS = {"source": "hjop", "running": True, "available": True, "speed": 10}
 
 class EventTests(unittest.TestCase):
     def manager(self, algorithms):
-        manager = ConfigManager()
+        manager = make_manager()
         manager.tree_data = {"groups": [{"name": str(i), "address": f"1:{i}", "algorithm": algorithm}
                                        for i, algorithm in enumerate(algorithms)]}
         for node in manager.tree_data["groups"]:
@@ -35,7 +36,7 @@ class EventTests(unittest.TestCase):
 
     def test_real_and_model_events_sort_without_mutating_schedules_or_rng(self):
         manager = self.manager(["prodejna", "chodba", "domacnost", "domacnost", "vyloha"])
-        corridor = CorridorLighting()
+        corridor = make_corridor()
         corridor.deadline = 110
         manager._instances[2] = corridor
         manager._households._states[3] = _HouseholdState(on_since=90, deadline=120)
@@ -61,7 +62,7 @@ class EventTests(unittest.TestCase):
 
     def test_dawn_cancels_corridor_turn_on(self):
         manager = self.manager(["chodba"])
-        corridor = CorridorLighting()
+        corridor = make_corridor()
         corridor.deadline = 130
         manager._instances[1] = corridor
         now = NOW.replace(hour=5, minute=59)
@@ -103,7 +104,7 @@ class EventTests(unittest.TestCase):
 
     def test_real_timer_projects_hjop_time_and_paused_clock_does_not_guess(self):
         manager = self.manager(["chodba", "minuta", "minuta"])
-        corridor = CorridorLighting()
+        corridor = make_corridor()
         corridor.deadline = 110
         manager._instances[1] = corridor
         with patch("events.monotonic", return_value=100):

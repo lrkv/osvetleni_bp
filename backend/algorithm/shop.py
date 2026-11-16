@@ -10,7 +10,7 @@ class Shop(ScheduledAlgorithm):
     def name() -> str:
         return "Prodejna"
 
-    def __init__(self, opening_time="07:00", closing_time="19:00"):
+    def __init__(self, opening_time, closing_time):
         self.opening_time = self._parse_time(opening_time, "opening_time")
         self.closing_time = self._parse_time(closing_time, "closing_time")
         if self.opening_time == self.closing_time:

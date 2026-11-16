@@ -10,10 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class HjopClock:
-    # service.py předává host a port z configurate/config.yaml (sekce hjop).
-    # Níže jsou pouze záložní hodnoty pro volání bez těchto argumentů.
-    def __init__(self, host="localhost", port=5896, *, timeout=5,
-                 reconnect_delay=3, idle_timeout=20, sync_timeout=240, on_change=None):
+    def __init__(self, host, port, *, timeout,
+                 reconnect_delay, idle_timeout, sync_timeout, on_change=None):
         self.host, self.port = host, int(port)
         self.timeout = float(timeout)
         self.reconnect_delay = float(reconnect_delay)

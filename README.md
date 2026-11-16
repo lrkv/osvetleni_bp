@@ -313,7 +313,6 @@ jsou definované v třídách jednotlivých algoritmů.
 | `corridor.py` | `CorridorLighting` | `chodba` |
 | `shop.py` | `Shop` | `prodejna` |
 | `shop_window.py` | `ShopWindow` | `vyloha` |
-| `disco.py` | `Disco` | `disco` |
 | `minute.py` | `Minute` | `minuta` |
 
 Registr tříd je v `backend/algorithm/__init__.py`; názvy pro web se z něj odvozují
@@ -340,3 +339,25 @@ Kontrolují se také porty, kladné časové limity, intervaly a denní rozvrhy.
 Starší sloučená konfigurace s klíči `light` nebo `configurate` a českou sekcí
 `chodba` se již nenačítá; použijte aktuální rozdělené soubory.
 Ani při `hjop.enabled: false` nevynechávejte ostatní položky sekce `hjop`.
+
+
+Nastavení externích připojení představují neměnné datové třídy `HjopConfig`
+a `MtbConfig` v `backend/connection_config.py`. Obě mají typované povinné
+položky a ověřují své hodnoty. `HjopClock(config, on_change=...)` a
+`DaemonClient(config, on_change=...)` dostávají pouze svou sekci konfigurace.
+Callback `on_change` propojuje aplikaci a do YAML nepatří. Formát konfiguračních
+souborů se tím nemění.
+
+
+## Automatické rozpoznání MTB modulů
+
+Před nastavením výstupů se backend démona asynchronně dotáže příkazem `module`
+na typ příslušného modulu. Po obnovení spojení se typ zjistí znovu.
+Podle typu použije formát MTB-UNI / MTB-UNIS (objekt s `type` a `value`),
+nebo MTB-LED (přímo `true` / `false`). V jedné konfiguraci mohou být oba typy.
+Neznámému typu se žádné výstupy neposílají a web zobrazí chybu.
+Kontroluje se i rozsah čísel výstupů: UNI 0–15, UNIS 0–27, LED 0–31.
+
+Softwarové blikání není implementované. Algoritmus `disco` byl odstraněn;
+jeho původní výskyty v dodaných YAML byly nahrazené `trvale_zapnuto`.
+Po aktualizaci restartujte backend. Externí kopie YAML upravte stejným způsobem.

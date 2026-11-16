@@ -4,30 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="přehled algoritmů">
+    <list default="true" id="2d51181d-79d3-4875-a950-c2a472afbd84" name="Changes" comment="Issues 1 - config">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NASAZENI.md" beforeDir="false" afterPath="$PROJECT_DIR$/NASAZENI.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/algorithm/corridor.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithm/corridor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/algorithm/household.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithm/household.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/algorithm/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithm/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/algorithm/disco.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/algorithm/info.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithm/info.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/algorithm/shop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithm/shop.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/configurate.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/configurate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/config/railway.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/config/railway.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/config/railway00.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/config/railway00.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/hjop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/hjop.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/mtb.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/mtb.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_algorithm_classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_algorithm_classes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_algorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/settings_validation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/settings_validation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/tests/config_fixtures.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/config_fixtures.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/tests/test_async.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_async.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_building_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_building_algorithms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/tests/test_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_events.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_hjop.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_hjop.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_household.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_household.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/tests/test_settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/tests/test_settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/web.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/web.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/tests/lighting.test.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/tests/lighting.test.mjs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -244,8 +236,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main (2)" />
-        <item itemvalue="Python tests.Python tests in tests" />
         <item itemvalue="npm.dev" />
+        <item itemvalue="Python tests.Python tests in tests" />
         <item itemvalue="Python.test" />
         <item itemvalue="Python tests.Python tests in test_algorithms.py" />
       </list>
@@ -285,7 +277,7 @@
       <workItem from="1792848887295" duration="14076000" />
       <workItem from="1792963693465" duration="1272000" />
       <workItem from="1792971248047" duration="23932000" />
-      <workItem from="1794692590440" duration="1262000" />
+      <workItem from="1794692590440" duration="4817000" />
     </task>
     <task id="LOCAL-00001" summary="úvodní nástřel">
       <option name="closed" value="true" />
@@ -447,7 +439,31 @@
       <option name="project" value="LOCAL" />
       <updated>1793368432993</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="zrušení výchozích hodnot #4">
+      <option name="closed" value="true" />
+      <created>1794847188250</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1794847188251</updated>
+    </task>
+    <task id="LOCAL-00022" summary=".">
+      <option name="closed" value="true" />
+      <created>1794850815121</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1794850815121</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Issues 1 - config">
+      <option name="closed" value="true" />
+      <created>1794850985486</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1794850985486</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,7 +486,10 @@
     <MESSAGE value="úprava načítání času" />
     <MESSAGE value="každý algoritmus je zvlášť soubor" />
     <MESSAGE value="přehled algoritmů" />
-    <option name="LAST_COMMIT_MESSAGE" value="přehled algoritmů" />
+    <MESSAGE value="zrušení výchozích hodnot #4" />
+    <MESSAGE value="." />
+    <MESSAGE value="Issues 1 - config" />
+    <option name="LAST_COMMIT_MESSAGE" value="Issues 1 - config" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/osvetleni_bp$mapa.coverage" NAME="mapa Coverage Results" MODIFIED="1778502313293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
@@ -478,7 +497,7 @@
     <SUITE FILE_PATH="coverage/osvetleni_bp$mainy.coverage" NAME="mainy Coverage Results" MODIFIED="1775817116383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/zk" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$zk.coverage" NAME="zk Coverage Results" MODIFIED="1786999472144" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$configurate.coverage" NAME="configurate Coverage Results" MODIFIED="1787077657854" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
-    <SUITE FILE_PATH="coverage/osvetleni_bp$main__2_.coverage" NAME="main (2) Coverage Results" MODIFIED="1793364733343" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
+    <SUITE FILE_PATH="coverage/osvetleni_bp$main__2_.coverage" NAME="main (2) Coverage Results" MODIFIED="1794853562084" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$main.coverage" NAME="main Coverage Results" MODIFIED="1775817135428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/dokumenty/oslava" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$.coverage" NAME=" Coverage Results" MODIFIED="1793363570921" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend/tests" />
     <SUITE FILE_PATH="coverage/osvetleni_bp$struktura.coverage" NAME="struktura Coverage Results" MODIFIED="1775939975721" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend" />

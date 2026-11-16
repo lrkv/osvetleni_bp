@@ -41,7 +41,7 @@ groups:
         address: "1:4"
 
       - name: "Hospoda U Zastávky"
-        algorithm: "disco"
+        algorithm: "trvale_zapnuto"
         address: "1:5"
 
       - name: "Bytovka - přízemí"
@@ -91,7 +91,7 @@ groups:
             notes: "je rozbitá"
             items:
               - name: "LED panel"
-                algorithm: "disco"
+                algorithm: "trvale_zapnuto"
                 address: "1:14"
           - name: "reflektor"
             algorithm: "trvale_zapnuto"

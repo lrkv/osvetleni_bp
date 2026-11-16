@@ -6,19 +6,14 @@ from contextlib import suppress
 from datetime import datetime, timedelta
 from time import monotonic
 
+from connection_config import HjopConfig
+
 logger = logging.getLogger(__name__)
 
 
 class HjopClock:
-    def __init__(self, host, port, *, timeout,
-                 reconnect_delay, idle_timeout, sync_timeout, on_change=None):
-        self.host, self.port = host, int(port)
-        self.timeout = float(timeout)
-        self.reconnect_delay = float(reconnect_delay)
-        self.idle_timeout = float(idle_timeout)
-        self.sync_timeout = float(sync_timeout)
-        if min(self.timeout, self.reconnect_delay, self.idle_timeout, self.sync_timeout) <= 0:
-            raise ValueError("Časové limity hJOP musí být kladné.")
+    def __init__(self, config: HjopConfig, *, on_change=None):
+        self.config = config
         self.on_change = on_change or (lambda: None)
         self.connected = False
         self.synced = False
@@ -38,7 +33,7 @@ class HjopClock:
 
     def status(self):
         now = self.now()
-        fresh = not (self.used and self.running) or monotonic() - self._received_at < self.sync_timeout
+        fresh = not (self.used and self.running) or monotonic() - self._received_at < self.config.sync_timeout
         return {
             "source": "hjop", "time": now.strftime("%H:%M:%S") if now else None,
             "connected": self.connected, "available": self.connected and self.synced and self.used and fresh,
@@ -80,19 +75,19 @@ class HjopClock:
             writer = None
             try:
                 reader, writer = await asyncio.wait_for(
-                    asyncio.open_connection(self.host, self.port, limit=1024 * 1024),
-                    self.timeout,
+                    asyncio.open_connection(self.config.host, self.config.port, limit=1024 * 1024),
+                    self.config.timeout,
                 )
                 writer.write(b"-;HELLO;1.1;osvetleni-clock\n")
-                await asyncio.wait_for(writer.drain(), self.timeout)
-                deadline = monotonic() + self.timeout
+                await asyncio.wait_for(writer.drain(), self.config.timeout)
+                deadline = monotonic() + self.config.timeout
                 while True:
-                    remaining = (self.sync_timeout - (monotonic() - self._received_at)
+                    remaining = (self.config.sync_timeout - (monotonic() - self._received_at)
                                  if self.synced and self.used and self.running else
                                  math.inf if self.synced else deadline - monotonic())
                     if remaining <= 0:
                         raise TimeoutError("hJOP neposlal synchronizaci času.")
-                    line = await asyncio.wait_for(reader.readline(), min(self.idle_timeout, remaining))
+                    line = await asyncio.wait_for(reader.readline(), min(self.config.idle_timeout, remaining))
                     if not line:
                         raise ConnectionError("hJOP ukončil spojení.")
                     fields = line.decode("utf-8").strip().split(";")
@@ -106,7 +101,7 @@ class HjopClock:
                     elif command == "PING" and len(fields) >= 4 and fields[2].upper() == "REQ-RESP":
                         ping_id = int(fields[3])
                         writer.write(f"-;PONG;{ping_id}\n".encode("ascii"))
-                        await asyncio.wait_for(writer.drain(), self.timeout)
+                        await asyncio.wait_for(writer.drain(), self.config.timeout)
                     elif command == "MOD-CAS":
                         if not self.connected:
                             raise ValueError("hJOP poslal čas před potvrzením spojení.")
@@ -119,5 +114,5 @@ class HjopClock:
                 if writer is not None:
                     writer.close()
                     with suppress(OSError, TimeoutError):
-                        await asyncio.wait_for(writer.wait_closed(), self.timeout)
-            await asyncio.sleep(self.reconnect_delay)
+                        await asyncio.wait_for(writer.wait_closed(), self.config.timeout)
+            await asyncio.sleep(self.config.reconnect_delay)

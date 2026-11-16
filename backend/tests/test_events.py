@@ -75,7 +75,7 @@ class EventTests(unittest.TestCase):
             self.assertFalse(forecast["events"][0]["on"])
 
     def test_missing_clock_and_static_algorithms(self):
-        manager = self.manager(["prodejna", "vyloha", "disco"])
+        manager = self.manager(["prodejna", "vyloha", "trvale_zapnuto"])
         forecast = upcoming_events(manager, "6:00", "20:00", None, {**STATUS, "available": False}, NOW)
         self.assertEqual(forecast["events"], [])
         self.assertEqual(len(forecast["unknown"]), 1)

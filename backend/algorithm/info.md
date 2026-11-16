@@ -46,7 +46,6 @@ nemusí nastat přesně na zlomek sekundy.
 | `chodba` | Chodba | `CorridorLighting`, `corridor.py` | `sunrise`, `sunset`, `corridor` |
 | `prodejna` | Prodejna | `Shop`, `shop.py` | `shop` |
 | `vyloha` | Výloha | `ShopWindow`, `shop_window.py` | Nemá vlastní nastavení |
-| `disco` | Blikání (disco) | `Disco`, `disco.py` | Nemá vlastní nastavení |
 | `minuta` | Minuta | `Minute`, `minute.py` | Střídání je pevné v kódu |
 
 ## Trvale zapnuto — `trvale_zapnuto`
@@ -191,12 +190,6 @@ Po změně souboru restartujte backend.
 
 Svítí nepřetržitě celý den i noc. Chová se stejně jako `trvale_zapnuto`,
 ale má vlastní označení a název pro web. Vlastní parametry v YAML nemá.
-
-## Blikání — `disco`
-
-Posílá MTB výstupní hodnotu `60`, která představuje blikání. Samotné blikání
-zajišťuje MTB, backend ho nepřepíná po jednotlivých záblescích.
-Nezávisí na čase. Rychlost blikání se tímto algoritmem v YAML nenastavuje.
 
 ## Minuta — `minuta`
 

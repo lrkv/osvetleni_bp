@@ -44,7 +44,7 @@ class LatestUpdates:
 
 class LightingService:
     def __init__(self, settings):
-        validate_settings(settings)
+        connections = validate_settings(settings)
         self.manager = ConfigManager.from_settings(settings['light'])
         self.manager.load_yaml(BASE_DIR / "config" / settings["configurate"])
         self.sunrise = str(settings["light"]["sunrise"])
@@ -54,23 +54,9 @@ class LightingService:
         self.clock_snapshot = ""
         self.events_snapshot = ""
         self.tasks = []
-        hjop = settings["hjop"]
-        self.use_hjop = hjop["enabled"]
-        self.model_clock = HjopClock(
-            hjop["host"], hjop["port"],
-            timeout=hjop["timeout"],
-            reconnect_delay=hjop["reconnect_delay"],
-            idle_timeout=hjop["idle_timeout"],
-            sync_timeout=hjop["sync_timeout"],
-            on_change=self.recalculate,
-        )
-        mtb = settings["mtb"]
-        self.daemon = DaemonClient(
-            mtb["host"], int(mtb["port"]),
-            timeout=float(mtb["timeout"]),
-            reconnect_delay=float(mtb["reconnect_delay"]),
-            on_change=self.publish,
-        )
+        self.use_hjop = connections.hjop.enabled
+        self.model_clock = HjopClock(connections.hjop, on_change=self.recalculate)
+        self.daemon = DaemonClient(connections.mtb, on_change=self.publish)
 
     def selected_time(self):
         status = self.model_clock.status()

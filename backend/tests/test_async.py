@@ -36,8 +36,16 @@ async def send(writer, message):
     await writer.drain()
 
 
+_test_writers = {}
+
+
 async def receive(reader):
-    return json.loads(await asyncio.wait_for(reader.readline(), 2))
+    message = json.loads(await asyncio.wait_for(reader.readline(), 2))
+    if message.get("command") == "module":
+        writer = _test_writers[id(reader)]
+        await send(writer, response(message, module={"address": message["address"], "type": "MTB-UNI v4"}))
+        return await receive(reader)
+    return message
 
 
 class DaemonTests(unittest.IsolatedAsyncioTestCase):
@@ -48,6 +56,7 @@ class DaemonTests(unittest.IsolatedAsyncioTestCase):
 
         async def peer(reader, writer):
             self.writers.append(writer)
+            _test_writers[id(reader)] = writer
             self.connections.put_nowait((reader, writer))
             task = asyncio.current_task()
             self.handlers.add(task)
@@ -180,10 +189,10 @@ class ServiceTests(unittest.IsolatedAsyncioTestCase):
         leaf = next(x for x in service.manager.items_by_id.values() if "address" in x)
         service.manager.change_algorithm(leaf["id"], "trvale_vypnuto")
         service.recalculate()
-        service.manager.change_algorithm(leaf["id"], "disco")
+        service.manager.change_algorithm(leaf["id"], "trvale_zapnuto")
         service.recalculate()
         self.assertEqual(queue.qsize(), 1)
-        self.assertIn('"algorithm": "disco"', queue.get_nowait())
+        self.assertIn('"algorithm": "trvale_zapnuto"', queue.get_nowait())
 
 
 class IntegrationTests(unittest.IsolatedAsyncioTestCase):
@@ -204,7 +213,10 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
             handlers.add(task)
             try:
                 while line := await reader.readline():
-                    requests.append(json.loads(line))
+                    request = json.loads(line)
+                    requests.append(request)
+                    if request["command"] == "module":
+                        await send(writer, response(request, module={"address": request["address"], "type": "MTB-UNI v4"}))
             finally:
                 writer.close()
                 await writer.wait_closed()
@@ -262,7 +274,7 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
                         "item_id": leaf["id"], "new_algorithm": "invalid",
                     })).status_code, 422)
                     self.assertEqual((await http.post("/api/algorithm", json={
-                        "item_id": -1, "new_algorithm": "disco",
+                        "item_id": -1, "new_algorithm": "trvale_zapnuto",
                     })).status_code, 404)
                     # A backend timer tick must not produce an unchanged WS snapshot.
                     with self.assertRaises(TimeoutError):

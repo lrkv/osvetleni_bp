@@ -56,7 +56,7 @@ test('UI receives pushes, reconnects, sends commands and cleans up', async () =>
     await new Promise(resolve => setTimeout(resolve, 10))
     assert.equal(sockets.length, 1)
     assert.equal(sockets[0].url, 'ws://192.168.1.20:8000/api/ws')
-    const state = { type: 'state', structure: { layout_name: 'Test' }, algorithms: ['disco'], algorithm_labels: { disco: 'Blikání (disco)' },
+    const state = { type: 'state', structure: { layout_name: 'Test' }, algorithms: ['trvale_zapnuto'], algorithm_labels: { trvale_zapnuto: 'zapnuto' },
       hardware: { connected: true, error: null, module_errors: {}, pending_modules: [] } }
     sockets[0].push(state)
     assert.equal(lighting.connected.value, true)
@@ -90,14 +90,14 @@ test('UI receives pushes, reconnects, sends commands and cleans up', async () =>
     }
     sockets[0].push({ type: 'clock', clock: { ...modelClock, connected: false } })
     assert.match(lighting.clockStatus.value, /odpojeno/)
-    assert.equal(lighting.algorithmLabel('disco'), 'Blikání (disco)')
+    assert.equal(lighting.algorithmLabel('trvale_zapnuto'), 'zapnuto')
     assert.equal(lighting.algorithmLabel('new_mode'), 'new mode')
-    await lighting.updateAlgorithm(3, 'disco')
+    await lighting.updateAlgorithm(3, 'trvale_zapnuto')
     assert.equal(posts[0].url, 'http://192.168.1.20:8000/api/algorithm')
-    assert.deepEqual(posts[0].options.body, { item_id: 3, new_algorithm: 'disco' })
+    assert.deepEqual(posts[0].options.body, { item_id: 3, new_algorithm: 'trvale_zapnuto' })
     sockets[0].close()
     assert.equal(lighting.connected.value, false)
-    await assert.rejects(lighting.updateAlgorithm(3, 'disco'), /připojený/)
+    await assert.rejects(lighting.updateAlgorithm(3, 'trvale_zapnuto'), /připojený/)
     await new Promise(resolve => setTimeout(resolve, 550))
     assert.equal(sockets.length, 2)
     sockets[1].push(state)

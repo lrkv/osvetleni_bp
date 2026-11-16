@@ -8,6 +8,7 @@ class ConfigurationError(ValueError):
 
 
 def mapping(value, keys, path):
+    keys = set(keys)
     if not isinstance(value, dict):
         raise ConfigurationError(f"Konfigurace {path}: očekávána sekce s položkami.")
     missing = set(keys) - value.keys()
@@ -52,18 +53,13 @@ def validate_settings(settings):
     text(settings['configurate'], 'layout.file')
     server = settings['server']
     mapping(server, ('host', 'port', 'allowed_origins', 'allowed_origin_regex'), 'server')
-    for section, keys in (('mtb', ('host', 'port', 'timeout', 'reconnect_delay')),
-                          ('hjop', ('enabled', 'host', 'port', 'timeout', 'reconnect_delay', 'idle_timeout', 'sync_timeout'))):
-        data = settings[section]
-        mapping(data, keys, section)
-        text(data['host'], section + '.host')
-        for key in keys:
-            if key.endswith('timeout') or key == 'reconnect_delay':
-                positive(data[key], section + '.' + key)
-    if not isinstance(settings['hjop']['enabled'], bool):
-        raise ConfigurationError('Konfigurace hjop.enabled: očekáváno true nebo false.')
+    from connection_config import HjopConfig, MtbConfig, ConnectionConfigs
+    connections = ConnectionConfigs(
+        hjop=HjopConfig.from_mapping(settings['hjop']),
+        mtb=MtbConfig.from_mapping(settings['mtb']),
+    )
     text(server['host'], 'server.host')
-    for section in ('server', 'mtb', 'hjop'):
+    for section in ('server',):
         port = settings[section]['port']
         positive(port, section + '.port', integer=True)
         if port > 65535:
@@ -78,3 +74,4 @@ def validate_settings(settings):
         except re.error as exc:
             raise ConfigurationError(f'Konfigurace server.allowed_origin_regex: {exc}') from exc
     validate_light(settings['light'])
+    return connections

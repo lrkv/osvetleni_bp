@@ -4,6 +4,7 @@ from algorithm import CorridorLighting, HouseholdLighting
 from algorithm.household import household_ratio
 from hjop import HjopClock
 from mtb import DaemonClient
+from connection_config import HjopConfig, MtbConfig
 
 
 def construct(cls, values, args, overrides):
@@ -37,12 +38,20 @@ def make_household(*args, **overrides):
 
 def make_hjop(*args, **overrides):
     values = load_settings()['hjop']
-    del values['enabled']
-    return construct(HjopClock, values, args, overrides)
+    callback = overrides.pop('on_change', None)
+    for key, value in zip(('host', 'port'), args):
+        values[key] = value
+    values.update(overrides)
+    return HjopClock(HjopConfig.from_mapping(values), on_change=callback)
 
 
 def make_daemon(*args, **overrides):
-    return construct(DaemonClient, load_settings()['mtb'], args, overrides)
+    values = load_settings()['mtb']
+    callback = overrides.pop('on_change', None)
+    for key, value in zip(('host', 'port'), args):
+        values[key] = value
+    values.update(overrides)
+    return DaemonClient(MtbConfig.from_mapping(values), on_change=callback)
 
 
 def configured_ratio(now):

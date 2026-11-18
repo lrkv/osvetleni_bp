@@ -3,7 +3,6 @@ from datetime import timedelta
 from time import monotonic
 import math
 
-from algorithm import ALGORITHMS
 
 
 def fixed_changes(algorithm, now, sunrise, sunset):

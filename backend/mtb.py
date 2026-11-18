@@ -5,7 +5,7 @@ import logging
 from contextlib import suppress
 
 from connection_config import MtbConfig
-from mtb_outputs import encode_outputs, output_format
+from mtb_outputs import encode_outputs
 
 logger = logging.getLogger(__name__)
 

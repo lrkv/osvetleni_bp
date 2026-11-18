@@ -10,8 +10,8 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config_fixtures import make_manager, make_household, configured_ratio
-from algorithms import ALGORITHM_LABELS, HouseholdLighting, HouseholdSchedule, household_ratio
-from configurate import BASE_DIR, ConfigManager, SUPPORTED_ALGORITHMS, load_settings
+from algorithms import ALGORITHM_LABELS, HouseholdSchedule
+from configurate import BASE_DIR, SUPPORTED_ALGORITHMS, load_settings
 from service import LightingService
 
 

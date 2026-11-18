@@ -1,0 +1,8 @@
+# Local IDE configuration and workspace state
+.idea/
+.vscode/
+.vs/
+.fleet/
+*.iml
+*.ipr
+*.iws

@@ -43,11 +43,6 @@ def load_settings(file_source=None):
     return data
 
 
-def load_configuration(file_source=None):
-    data = load_settings(file_source)
-    return data['light']['sunrise'], data['light']['sunset'], data['configurate']
-
-
 class ConfigManager:
     def __init__(self, corridor_pause_min, corridor_pause_max, *,
                  corridor_min_on_seconds, corridor_max_on_seconds,
@@ -130,34 +125,6 @@ class ConfigManager:
         if 'items' in item:
             for child in item['items']:
                 self._process_item(child)
-
-    def print_structure(self, item=None, level=0):
-        # Pokud nepošleme konkrétní prvek, tiskneme od úplného začátku
-        if item is None:
-            layout_name = self.tree_data.get('layout_name', 'Kolejiště')
-            print(f"=== {layout_name} ===")
-
-            if 'groups' in self.tree_data:
-                for group in self.tree_data['groups']:
-                    self.print_structure(group, level + 1)
-            return
-
-        indent = "  " * level
-        item_id = item.get('id')
-        name = item.get('name')
-
-        # Rozlišení, jestli jde o fyzické světlo (má adresu) nebo jen skupinu
-        if 'address' in item:
-            address = item.get('address')
-            algorithm = item.get('algorithm')
-            print(f"{indent}[ID: {item_id:02d}] Světlo: {name} (Adresa: {address}, Algoritmus: {algorithm})")
-        else:
-            print(f"{indent}[ID: {item_id:02d}] Skupina: {name}")
-
-        # Pokud jsme ve skupině, vytiskneme postupně i její potomky
-        if 'items' in item:
-            for child in item['items']:
-                self.print_structure(child, level + 1)
 
     def change_algorithm(self, target_id: int, new_algorithm: str) -> bool:
         if new_algorithm not in SUPPORTED_ALGORITHMS:

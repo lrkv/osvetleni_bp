@@ -7,7 +7,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config_fixtures import make_manager
 from algorithms import evaluate_algorithm, parse_time_to_datetime
-from configurate import ConfigManager, SUPPORTED_ALGORITHMS, load_settings
+from configurate import SUPPORTED_ALGORITHMS, load_settings
 
 
 class RailwayLightingTests(unittest.TestCase):

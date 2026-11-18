@@ -8,9 +8,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config_fixtures import make_manager, make_hjop
-from hjop import HjopClock
 from service import LatestUpdates, LightingService
-from configurate import load_settings, ConfigManager
+from configurate import load_settings
 
 
 class LayoutTests(unittest.TestCase):

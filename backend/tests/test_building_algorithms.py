@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from config_fixtures import make_manager, make_corridor
-from algorithms import CorridorLighting, evaluate_algorithm
-from configurate import ConfigManager, SUPPORTED_ALGORITHMS, load_settings
+from algorithms import evaluate_algorithm
+from configurate import SUPPORTED_ALGORITHMS, load_settings
 from service import LightingService
 
 

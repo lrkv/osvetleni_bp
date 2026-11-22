@@ -8,7 +8,8 @@ from mtb import DaemonClient
 from hjop import HjopClock
 from algorithm import ALGORITHM_LABELS
 from events import upcoming_events
-from settings_validation import validate_settings
+from connection_config import HjopConfig, MtbConfig, ServerConfig
+from yaml_config import mapping, text
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,11 @@ class LatestUpdates:
 
 class LightingService:
     def __init__(self, settings):
-        connections = validate_settings(settings)
+        mapping(settings, ('configurate', 'light', 'server', 'mtb', 'hjop'), 'config')
+        text(settings['configurate'], 'layout.file')
+        ServerConfig.from_mapping(settings['server'])
+        hjop_config = HjopConfig.from_mapping(settings['hjop'])
+        mtb_config = MtbConfig.from_mapping(settings['mtb'])
         self.manager = ConfigManager.from_settings(settings['light'])
         self.manager.load_yaml(BASE_DIR / "config" / settings["configurate"])
         self.sunrise = str(settings["light"]["sunrise"])
@@ -54,9 +59,9 @@ class LightingService:
         self.clock_snapshot = ""
         self.events_snapshot = ""
         self.tasks = []
-        self.use_hjop = connections.hjop.enabled
-        self.model_clock = HjopClock(connections.hjop, on_change=self.recalculate)
-        self.daemon = DaemonClient(connections.mtb, on_change=self.publish)
+        self.use_hjop = hjop_config.enabled
+        self.model_clock = HjopClock(hjop_config, on_change=self.recalculate)
+        self.daemon = DaemonClient(mtb_config, on_change=self.publish)
 
     def selected_time(self):
         status = self.model_clock.status()

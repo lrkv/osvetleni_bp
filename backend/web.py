@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 from configurate import SUPPORTED_ALGORITHMS, load_settings
 from service import LightingService
-from settings_validation import validate_settings
 
 
 class UpdateRequest(BaseModel):
@@ -17,7 +16,6 @@ class UpdateRequest(BaseModel):
 
 def create_app(settings=None):
     settings = settings if settings is not None else load_settings()
-    validate_settings(settings)
 
     @asynccontextmanager
     async def lifespan(app):

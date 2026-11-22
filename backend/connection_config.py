@@ -2,7 +2,21 @@
 from dataclasses import dataclass, fields
 from typing import Self
 
-from settings_validation import ConfigurationError, integer, mapping, positive, text
+import math
+
+from yaml_config import ConfigurationError, mapping, text
+
+
+def integer(value, path):
+    if type(value) is not int:
+        raise ConfigurationError(f"Konfigurace {path}: očekáváno celé číslo.")
+
+
+def positive(value, path, integer=False):
+    if (isinstance(value, bool) or not isinstance(value, (int, float))
+            or not math.isfinite(value) or value <= 0 or (integer and not isinstance(value, int))):
+        raise ConfigurationError(f"Konfigurace {path}: očekáváno kladné {'celé číslo' if integer else 'číslo'}.")
+
 
 
 def validate_connection(config, section, time_fields):
@@ -50,6 +64,15 @@ class MtbConfig:
 
 
 @dataclass(frozen=True, slots=True)
-class ConnectionConfigs:
-    hjop: HjopConfig
-    mtb: MtbConfig
+class ServerConfig:
+    host: str
+    port: int
+
+    def __post_init__(self):
+        text(self.host, "server.host")
+        integer(self.port, "server.port")
+
+    @classmethod
+    def from_mapping(cls, data) -> Self:
+        mapping(data, (field.name for field in fields(cls)), "server")
+        return cls(**data)

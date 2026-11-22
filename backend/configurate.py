@@ -2,9 +2,9 @@ import logging
 from pathlib import Path
 from datetime import datetime
 
-import yaml
+import re
 from functools import partial
-from settings_validation import mapping, validate_settings, validate_light
+from yaml_config import ConfigurationError, mapping, text, read_mapping
 from algorithm import ALGORITHMS, CorridorLighting, HouseholdLighting, Shop
 
 logger = logging.getLogger(__name__)
@@ -19,27 +19,15 @@ def load_settings(file_source=None):
     path = Path(file_source) if file_source else BASE_DIR / "config" / "config.yaml"
     path = path.resolve()
 
-    def read_mapping(source):
-        with source.open(encoding="utf-8") as file:
-            value = yaml.safe_load(file)
-        if not isinstance(value, dict):
-            raise ValueError(f"Konfigurace {source} musí obsahovat YAML sekce.")
-        return value
-
     data = read_mapping(path)
     mapping(data, ('layout', 'algorithms_file', 'server', 'mtb', 'hjop'), str(path))
     mapping(data['layout'], ('file',), 'layout')
-    from settings_validation import text
     text(data['layout']['file'], 'layout.file')
     text(data['algorithms_file'], 'algorithms_file')
     algorithms_path = path.parent / data.pop('algorithms_file')
     light = read_mapping(algorithms_path)
     data['configurate'] = str((path.parent / data.pop('layout')['file']).resolve())
     data['light'] = light
-    try:
-        validate_settings(data)
-    except ValueError as exc:
-        raise ValueError(f"Konfigurace {path} / {algorithms_path}: {exc}") from exc
     return data
 
 
@@ -73,7 +61,13 @@ class ConfigManager:
 
     @classmethod
     def from_settings(cls, light):
-        validate_light(light)
+        mapping(light, ('sunrise', 'sunset', 'corridor', 'household', 'shop'), 'light')
+        for key in ('sunrise', 'sunset'):
+            if not isinstance(light[key], str) or not re.fullmatch(r'(?:[01]?\d|2[0-3]):[0-5]\d', light[key], re.ASCII):
+                raise ConfigurationError(f"Konfigurace light.{key}: očekáván čas HH:MM.")
+        mapping(light['corridor'], ('min_on_seconds', 'max_on_seconds', 'pause_min_seconds', 'pause_max_seconds'), 'corridor')
+        mapping(light['household'], ('min_on_seconds', 'max_on_seconds', 'min_off_seconds', 'schedule'), 'household')
+        mapping(light['shop'], ('opening_time', 'closing_time'), 'shop')
         corridor, household, shop = light['corridor'], light['household'], light['shop']
         return cls(corridor['pause_min_seconds'], corridor['pause_max_seconds'],
                    corridor_min_on_seconds=corridor['min_on_seconds'],
@@ -97,8 +91,7 @@ class ConfigManager:
         self.items_by_id.clear()
         self.next_id = 1
         # Načtení YAML souboru
-        with open(file_path, 'r', encoding='utf-8') as file:
-            self.tree_data = yaml.safe_load(file)
+        self.tree_data = read_mapping(file_path)
 
         # Projdeme hlavní skupiny z YAMLu a postupně jim přiřadíme ID
         if 'groups' in self.tree_data:

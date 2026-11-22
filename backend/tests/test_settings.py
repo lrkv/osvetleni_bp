@@ -10,6 +10,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from configurate import BASE_DIR, load_settings
 from service import LightingService
+from yaml_config import ConfigurationError, read_mapping
 
 
 class SettingsTests(unittest.TestCase):
@@ -90,3 +91,36 @@ class SettingsTests(unittest.TestCase):
         self.assertTrue(Path(settings["configurate"]).is_file())
         self.assertIn("sunrise", settings["light"])
         self.assertIn("household", settings["light"])
+
+
+class YamlErrorsTests(unittest.TestCase):
+    def test_invalid_yaml_reports_file_line_and_column(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "broken.yaml"
+            path.write_text("section: [\n", encoding="utf-8")
+            with self.assertRaises(ConfigurationError) as error:
+                read_mapping(path)
+            message = str(error.exception)
+            self.assertIn(str(path), message)
+            self.assertIn("Neplatný YAML", message)
+            self.assertIn("řádek 2, sloupec 1", message)
+            self.assertIsInstance(error.exception.__cause__, yaml.YAMLError)
+
+    def test_algorithm_yaml_error_identifies_algorithm_file(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            data = {"layout": {"file": "layout.yaml"}, "algorithms_file": "timing.yaml"}
+            data.update({key: load_settings()[key] for key in ("server", "mtb", "hjop")})
+            (root / "config.yaml").write_text(yaml.safe_dump(data), encoding="utf-8")
+            (root / "timing.yaml").write_text("sunrise: [\n", encoding="utf-8")
+            with self.assertRaisesRegex(ConfigurationError, r"Neplatný YAML.*timing\.yaml"):
+                load_settings(root / "config.yaml")
+
+    def test_layout_yaml_error_uses_same_readable_message(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "layout.yaml"
+            path.write_text("groups: [\n", encoding="utf-8")
+            settings = load_settings()
+            settings["configurate"] = str(path)
+            with self.assertRaisesRegex(ConfigurationError, r"Neplatný YAML.*layout\.yaml"):
+                LightingService(settings)

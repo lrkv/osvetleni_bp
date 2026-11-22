@@ -9,7 +9,7 @@ from connection_config import HjopConfig, MtbConfig
 from hjop import HjopClock
 from mtb import DaemonClient
 from service import LightingService
-from settings_validation import ConfigurationError
+from yaml_config import ConfigurationError
 
 
 class ConnectionConfigTests(unittest.TestCase):

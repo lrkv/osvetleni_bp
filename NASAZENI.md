@@ -88,7 +88,7 @@ server:
   port: 8000
 ```
 
-Toto je jen výřez sekce. Zachovejte také její existující `allowed_origins` a `allowed_origin_regex`.
+Sekce `server` obsahuje pouze `host` a `port`.
 `0.0.0.0` zpřístupní backend na síťových rozhraních počítače. Pro přístup pouze z tohoto počítače použijte `127.0.0.1`.
 Adresa `0.0.0.0` se nepíše do prohlížeče ani jako cílová adresa backendu ve frontendu.
 
@@ -217,7 +217,7 @@ $env:PORT = '3000'
 node .output/server/index.mjs
 ```
 
-Explicitní `HOST` zpřístupní frontend také v LAN. Port lze změnit, ale je nutné tomu přizpůsobit adresu v prohlížeči a případně povolené originy backendu.
+Explicitní `HOST` zpřístupní frontend také v LAN. Port lze změnit; přizpůsobte tomu adresu v prohlížeči.
 
 Na tomto počítači otevřete:
 
@@ -249,9 +249,9 @@ Povolte potřebná spojení v používané privátní síti:
 Porty odpovídají výchozím hodnotám; při vlastní konfiguraci použijte své hodnoty.
 Prohlížeč se připojuje přímo k backendu, takže nestačí zpřístupnit jen frontend.
 
-V `server.allowed_origins` backendu povolujte adresu **frontendu**, včetně protokolu a portu.
-Dodaný `allowed_origin_regex` povoluje běžné privátní IPv4 adresy LAN a localhost.
-Při použití vlastního DNS názvu přidejte do seznamu například `http://kolejiste.local:3000`.
+Backend neomezuje adresy frontendů: HTTP odpovědi povolují libovolný původ
+(`Access-Control-Allow-Origin: *`) a WebSocket nekontroluje hlavičku `Origin`.
+DNS jména jako `osvetleni.kmz` proto nemusíte přidávat do žádného seznamu.
 
 Při použití HTTPS musí být dostupný i HTTPS backend; WebSocket potom používá WSS.
 Pokud provozujete aplikaci za reverzní proxy, musí předávat také WebSocket spojení `/api/ws`.
@@ -344,7 +344,7 @@ Dostupnost MTB Daemona, hJOP, případných ovladačů a hardwaru řešte pro da
 | Příkaz `python`, `node` nebo `npm` není rozpoznán | Instalaci programu a jeho dostupnost v PATH; po instalaci otevřete nový terminál. |
 | `ModuleNotFoundError` | Backend spouštějte Pythonem z `.venv` a nainstalujte `backend/requirements.txt` do stejného prostředí. |
 | Web funguje na počítači, ale ne v telefonu | IP adresu, stejnou LAN, naslouchání na `0.0.0.0` a firewall. |
-| Frontend se načte, backend je odpojený | Adresu v nasazeném `backend-config.json`, dostupnost portu 8000 a povolené originy. |
+| Frontend se načte, backend je odpojený | Adresu v nasazeném `backend-config.json`, dostupnost portu 8000 a shodné použití HTTP/HTTPS. |
 | Spojení s MTB nebo hJOP bylo odmítnuto | Zda cílový program běží, správný host/port, firewall a zda `localhost` skutečně označuje správný počítač. |
 | Modelový čas stojí | Stav spojení, synchronizaci a běh modelového času v hJOP. Pro systémový čas nastavte `hjop.enabled: false` a restartujte backend. |
 | Port je již obsazený | Zda už neběží druhá instance; ukončete ji nebo zvolte jiný port. |
@@ -358,8 +358,7 @@ Hodnoty nastavení jsou uvedené v `backend/config/config.yaml` a souboru
 určeném klíčem `algorithms_file` (standardně `algorithms.yaml`). Python
 nedoplňuje náhradní hodnoty. Všechny sekce a jejich položky v dodaných souborech
 jsou povinné; výjimkou je `end_percent` u položky rozvrhu domácností, jehož
-vynechání znamená konstantní podíl. `server.allowed_origin_regex` lze výslovně
-nastavit na `null`, aby se použil pouze seznam `allowed_origins`.
+vynechání znamená konstantní podíl. Sekce `server` obsahuje pouze `host` a `port`.
 
 Při chybějící hodnotě, neznámém názvu položky nebo neplatném typu se backend
 nespustí a chyba uvede příslušnou položku. Například překlep
@@ -403,3 +402,8 @@ Nekopírujte `node_modules` z Windows na Raspberry Pi. Závislosti se instalují
 přímo na cílovém systému příkazem `npm ci`, který vybere příslušné nativní balíčky.
 U statického nasazení lze naopak přenést pouze hotový obsah `.output/public`;
 pro jeho obsluhu už Node.js ani nativní sestavovací závislosti nejsou potřeba.
+
+
+Při aktualizaci starší konfigurace odstraňte ze sekce `server` položky
+`allowed_origins` a `allowed_origin_regex`; už se nepoužívají. Potom restartujte
+backend. Kontrola neznámých konfiguračních položek zůstává zapnutá.

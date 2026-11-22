@@ -52,7 +52,7 @@ def validate_settings(settings):
     mapping(settings, ('configurate', 'light', 'server', 'mtb', 'hjop'), 'config')
     text(settings['configurate'], 'layout.file')
     server = settings['server']
-    mapping(server, ('host', 'port', 'allowed_origins', 'allowed_origin_regex'), 'server')
+    mapping(server, ('host', 'port'), 'server')
     from connection_config import HjopConfig, MtbConfig, ConnectionConfigs
     connections = ConnectionConfigs(
         hjop=HjopConfig.from_mapping(settings['hjop']),
@@ -64,14 +64,5 @@ def validate_settings(settings):
         positive(port, section + '.port', integer=True)
         if port > 65535:
             raise ConfigurationError(f'Konfigurace {section}.port: port musí být nejvýše 65535.')
-    if not isinstance(server['allowed_origins'], list) or any(not isinstance(item, str) or not item for item in server['allowed_origins']):
-        raise ConfigurationError('Konfigurace server.allowed_origins: očekáván seznam adres.')
-    regex = server['allowed_origin_regex']
-    if regex is not None:
-        text(regex, 'server.allowed_origin_regex')
-        try:
-            re.compile(regex)
-        except re.error as exc:
-            raise ConfigurationError(f'Konfigurace server.allowed_origin_regex: {exc}') from exc
     validate_light(settings['light'])
     return connections

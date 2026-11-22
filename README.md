@@ -70,16 +70,13 @@ nasazenou kopii nebo nasaďte nový build.
 Cesty jsou relativní vůči `config.yaml`. Používejte aktuální rozdělené konfigurační soubory.
 
 - `server.host` a `server.port`: rozhraní a port HTTP/WebSocket serveru.
-- `server.allowed_origins`: povolené adresy frontendů, včetně protokolu a portu.
-- `server.allowed_origin_regex`: výchozí povolení localhostu a privátních IPv4
-  LAN adres. Pro přístup přes DNS jméno nebo IPv6 přidejte přesný origin například
-  `http://kolejiste.local:3000` do `allowed_origins`.
+- Adresa frontendu se v backendu neomezuje: HTTP povoluje libovolný původ
+  (`Access-Control-Allow-Origin: *`) a WebSocket původ nekontroluje.
 - `mtb.host`, `mtb.port`, `mtb.timeout`, `mtb.reconnect_delay`: spojení s démonem
   a časové limity v sekundách.
 
-Pravidla originů platí pro HTTP i WebSocket. U oddělených serverů sem patří
-adresa **frontendu**, kterou otevírá prohlížeč. Aplikace je určena pro důvěryhodnou
-LAN; nemá přihlášení uživatelů. Změna backendové konfigurace vyžaduje restart.
+Backend přijímá frontend z libovolného DNS jména, IP adresy a portu.
+Seznam povolených adres se nenastavuje.
 
 Spouštějte jednu instanci backendu / jeden Uvicorn worker pro jedno kolejiště.
 Pro běžné spuštění použijte `python backend/main.py`; alternativně
@@ -131,7 +128,7 @@ npm run build
 Testy používají místní falešný MTB server a neovládají skutečné kolejiště.
 Ověřují rozdělené TCP zprávy, pořadí odpovědí, timeouty, reconnect,
 slučování změn, API při mlčícím démonu, WebSocket pro více klientů,
-CORS/originy, konfiguraci URL a obnovování spojení frontendu.
+přístup z libovolného originu, konfiguraci URL a obnovování spojení frontendu.
 
 Specifikace protokolu:
 [MTB Daemon TCP JSON](https://github.com/kmzbrnoI/mtb-daemon/blob/master/tcp-protocol/README.md).
@@ -329,8 +326,7 @@ Hodnoty nastavení jsou uvedené v `backend/config/config.yaml` a souboru
 určeném klíčem `algorithms_file` (standardně `algorithms.yaml`). Python
 nedoplňuje náhradní hodnoty. Všechny sekce a jejich položky v dodaných souborech
 jsou povinné; výjimkou je `end_percent` u položky rozvrhu domácností, jehož
-vynechání znamená konstantní podíl. `server.allowed_origin_regex` lze výslovně
-nastavit na `null`, aby se použil pouze seznam `allowed_origins`.
+vynechání znamená konstantní podíl. Sekce `server` obsahuje pouze `host` a `port`.
 
 Při chybějící hodnotě, neznámém názvu položky nebo neplatném typu se backend
 nespustí a chyba uvede příslušnou položku. Například překlep
@@ -361,3 +357,8 @@ Kontroluje se i rozsah čísel výstupů: UNI 0–15, UNIS 0–27, LED 0–31.
 Softwarové blikání není implementované. Algoritmus `disco` byl odstraněn;
 jeho původní výskyty v dodaných YAML byly nahrazené `trvale_zapnuto`.
 Po aktualizaci restartujte backend. Externí kopie YAML upravte stejným způsobem.
+
+
+Při aktualizaci starší konfigurace odstraňte ze sekce `server` položky
+`allowed_origins` a `allowed_origin_regex`; už se nepoužívají. Potom restartujte
+backend. Kontrola neznámých konfiguračních položek zůstává zapnutá.

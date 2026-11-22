@@ -1,5 +1,4 @@
 import asyncio
-import re
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
@@ -19,9 +18,6 @@ class UpdateRequest(BaseModel):
 def create_app(settings=None):
     settings = settings if settings is not None else load_settings()
     validate_settings(settings)
-    server = settings["server"]
-    origins = server["allowed_origins"]
-    origin_regex = server["allowed_origin_regex"]
 
     @asynccontextmanager
     async def lifespan(app):
@@ -35,9 +31,9 @@ def create_app(settings=None):
 
     app = FastAPI(lifespan=lifespan)
     app.add_middleware(
-        CORSMiddleware, allow_origins=origins, allow_origin_regex=origin_regex,
-        allow_credentials=False, allow_methods=["GET", "POST"],
-        allow_headers=["Content-Type"],
+        # Browsers still require these headers when frontend/backend use different ports.
+        CORSMiddleware, allow_origins=["*"],
+        allow_credentials=False, allow_methods=["*"], allow_headers=["*"],
     )
 
     @app.get("/api/structure")
@@ -57,13 +53,6 @@ def create_app(settings=None):
 
     @app.websocket("/api/ws")
     async def state_socket(websocket: WebSocket):
-        origin = websocket.headers.get("origin")
-        if origin and not (
-            origin in origins or "*" in origins
-            or (origin_regex and re.fullmatch(origin_regex, origin))
-        ):
-            await websocket.close(code=1008)
-            return
         await websocket.accept()
         service = websocket.app.state.service
         queue = service.subscribe()

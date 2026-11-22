@@ -10,12 +10,6 @@ algorithms_file: "algorithms.yaml"
 server:
   host: "0.0.0.0"  # 0.0.0.0 = přístup z LAN
   port: 8000  # HTTP API a WebSocket
-  # Povolené adresy frontendu (protokol, hostname/IP a port).
-  allowed_origins:
-    - "http://localhost:3000"
-    - "http://127.0.0.1:3000"
-  # Navíc povoluje localhost a privátní IPv4 adresy v LAN.
-  allowed_origin_regex: 'https?://(localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(:\d+)?'
 
 # Spojení s MTB démonem.
 mtb:

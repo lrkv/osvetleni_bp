@@ -200,7 +200,6 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
         import httpx
         import uvicorn
         from websockets.asyncio.client import connect
-        from websockets.exceptions import InvalidStatus
         from web import create_app
 
         peers = []
@@ -238,13 +237,16 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
             await eventually(lambda: server.started)
             base = f"http://127.0.0.1:{port}"
             wsurl = f"ws://127.0.0.1:{port}/api/ws"
-            origin = "http://192.168.1.42:3000"
-            async with httpx.AsyncClient(base_url=base, timeout=1) as http:
-                preflight = await http.options("/api/algorithm", headers={
-                    "Origin": origin, "Access-Control-Request-Method": "POST",
-                    "Access-Control-Request-Headers": "content-type",
-                })
-                self.assertEqual(preflight.headers["access-control-allow-origin"], origin)
+            origin = "http://osvetleni.kmz"
+            async with httpx.AsyncClient(base_url=base, timeout=1, headers={"Origin": origin}) as http:
+                for frontend_origin in (origin, "http://192.168.1.42:3000", "https://unrelated.example:9443"):
+                    preflight = await http.options("/api/algorithm", headers={
+                        "Origin": frontend_origin, "Access-Control-Request-Method": "POST",
+                        "Access-Control-Request-Headers": "content-type,x-client-test",
+                    })
+                    self.assertEqual(preflight.status_code, 200)
+                    self.assertEqual(preflight.headers["access-control-allow-origin"], "*")
+                    self.assertIn("x-client-test", preflight.headers["access-control-allow-headers"])
                 async with connect(wsurl, origin=origin) as ws1, connect(wsurl, origin=origin) as ws2:
                     first = json.loads(await ws1.recv())
                     await ws2.recv()
@@ -254,6 +256,7 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
                         "item_id": leaf["id"], "new_algorithm": "trvale_vypnuto",
                     })
                     self.assertEqual(result.status_code, 202)
+                    self.assertEqual(result.headers["access-control-allow-origin"], "*")
 
                     async def await_changed(ws):
                         async with asyncio.timeout(1):
@@ -287,9 +290,10 @@ class IntegrationTests(unittest.IsolatedAsyncioTestCase):
                     state = json.loads(await reconnected.recv())
                     self.assertEqual(state["structure"]["groups"][0]["items"][0]["algorithm"],
                                      "trvale_vypnuto")
-                with self.assertRaises(InvalidStatus):
-                    async with connect(wsurl, origin="https://unrelated.example"):
-                        self.fail("Origin should have been rejected")
+                for frontend_origin in ("https://unrelated.example:9443", None):
+                    async with connect(wsurl, origin=frontend_origin) as unrestricted:
+                        state = json.loads(await unrestricted.recv())
+                        self.assertEqual(state["type"], "state")
         finally:
             server.should_exit = True
             await asyncio.wait_for(server_task, 5)

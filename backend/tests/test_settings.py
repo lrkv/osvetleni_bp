@@ -56,7 +56,7 @@ class SettingsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "pause_min_second"):
             LightingService(settings)
         for section, key, value in (("hjop", "enabled", "false"), ("mtb", "port", True),
-                                    ("mtb", "timeout", float("nan")), ("server", "port", 65536)):
+                                    ("mtb", "timeout", float("nan")), ("server", "port", "8000")):
             settings = copy.deepcopy(complete)
             settings[section][key] = value
             with self.subTest(section=section, key=key), self.assertRaises(ValueError):

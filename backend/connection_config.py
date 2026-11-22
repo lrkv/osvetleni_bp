@@ -2,14 +2,12 @@
 from dataclasses import dataclass, fields
 from typing import Self
 
-from settings_validation import ConfigurationError, mapping, positive, text
+from settings_validation import ConfigurationError, integer, mapping, positive, text
 
 
 def validate_connection(config, section, time_fields):
     text(config.host, section + ".host")
-    positive(config.port, section + ".port", integer=True)
-    if config.port > 65535:
-        raise ConfigurationError(f"Konfigurace {section}.port: port musí být nejvýše 65535.")
+    integer(config.port, section + ".port")
     for key in time_fields:
         positive(getattr(config, key), section + "." + key)
 

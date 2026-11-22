@@ -30,7 +30,7 @@ class ConnectionConfigTests(unittest.TestCase):
         settings = load_settings()
         for cls, section in ((HjopConfig, 'hjop'), (MtbConfig, 'mtb')):
             config = cls.from_mapping(settings[section])
-            for field, value in (('port', True), ('port', 65536), ('timeout', float('nan')), ('host', '')):
+            for field, value in (('port', True), ('port', '3841'), ('timeout', float('nan')), ('host', '')):
                 with self.subTest(section=section, field=field), self.assertRaises(ConfigurationError):
                     replace(config, **{field: value})
             incomplete = dict(settings[section])

@@ -363,7 +363,8 @@ vynechání znamená konstantní podíl. Sekce `server` obsahuje pouze `host` a 
 Při chybějící hodnotě, neznámém názvu položky nebo neplatném typu se backend
 nespustí a chyba uvede příslušnou položku. Například překlep
 `pause_min_second` místo `pause_min_seconds` vyvolá chybu konfigurace.
-Kontrolují se také porty, kladné časové limity, intervaly a denní rozvrhy.
+Kontrolují se také celočíselný typ portů, kladné časové limity, intervaly a denní rozvrhy.
+Přípustný rozsah síťových portů ověřuje síťová knihovna při připojení nebo spuštění serveru.
 Starší sloučená konfigurace s klíči `light` nebo `configurate` a českou sekcí
 `chodba` se již nenačítá; použijte aktuální rozdělené soubory.
 Ani při `hjop.enabled: false` nevynechávejte ostatní položky sekce `hjop`.

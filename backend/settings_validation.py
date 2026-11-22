@@ -27,6 +27,11 @@ def text(value, path):
         raise ConfigurationError(f"Konfigurace {path}: očekáván neprázdný text.")
 
 
+def integer(value, path):
+    if type(value) is not int:
+        raise ConfigurationError(f"Konfigurace {path}: očekáváno celé číslo.")
+
+
 def positive(value, path, integer=False):
     if (isinstance(value, bool) or not isinstance(value, (int, float))
             or not math.isfinite(value) or value <= 0 or (integer and not isinstance(value, int))):
@@ -59,10 +64,6 @@ def validate_settings(settings):
         mtb=MtbConfig.from_mapping(settings['mtb']),
     )
     text(server['host'], 'server.host')
-    for section in ('server',):
-        port = settings[section]['port']
-        positive(port, section + '.port', integer=True)
-        if port > 65535:
-            raise ConfigurationError(f'Konfigurace {section}.port: port musí být nejvýše 65535.')
+    integer(server['port'], 'server.port')
     validate_light(settings['light'])
     return connections

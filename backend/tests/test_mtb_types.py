@@ -92,6 +92,15 @@ class ModuleTypeTests(unittest.IsolatedAsyncioTestCase):
         await eventually(lambda: 11 in self.client.confirmed)
         self.assertFalse(self.client.status()['module_errors'])
 
+    async def test_daemon_validates_port_and_reports_its_error(self):
+        self.client.set_outputs(11, {32: 1})
+        await self.answer_type('MTB-LED')
+        request = await receive_wire(self.reader)
+        self.assertIs(request['outputs']['32'], True)
+        await send(self.writer, response(request, status='error', error={'message': 'Invalid port 32'}))
+        await eventually(lambda: self.client.module_errors.get(11) == 'Invalid port 32')
+        self.assertNotIn(11, self.client.confirmed)
+
 
 class OutputFormatTests(unittest.TestCase):
     def test_led_only_accepts_boolean_states(self):
@@ -100,7 +109,10 @@ class OutputFormatTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             encode_outputs('MTB-LED', {0: 60})
 
-    def test_ports_are_validated_for_each_module(self):
-        for kind, port in [('MTB-UNI v4', 16), ('MTB-LED', 32), ('MTB-UNIS', 28)]:
-            with self.subTest(kind=kind), self.assertRaises(ValueError):
-                encode_outputs(kind, {port: 1})
+    def test_port_numbers_do_not_limit_output_encoding(self):
+        for kind in ('MTB-UNI', 'MTB-UNI v2', 'MTB-UNI v4', 'MTB-UNIS', 'MTB-LED'):
+            for port in (-1, 16, 28, 32, 1000):
+                with self.subTest(kind=kind, port=port):
+                    encoded = encode_outputs(kind, {port: 1})
+                    expected = True if kind == 'MTB-LED' else {'type': 'plain', 'value': 1}
+                    self.assertEqual(encoded, {port: expected})

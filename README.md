@@ -353,7 +353,8 @@ na typ příslušného modulu. Po obnovení spojení se typ zjistí znovu.
 Podle typu použije formát MTB-UNI / MTB-UNIS (objekt s `type` a `value`),
 nebo MTB-LED (přímo `true` / `false`). V jedné konfiguraci mohou být oba typy.
 Neznámému typu se žádné výstupy neposílají a web zobrazí chybu.
-Kontroluje se i rozsah čísel výstupů: UNI 0–15, UNIS 0–27, LED 0–31.
+Platnost čísel výstupních portů ověřuje MTB daemon. Backend pouze zakóduje
+hodnoty podle typu modulu; případnou chybu od daemona zobrazí na webu.
 
 Softwarové blikání není implementované. Algoritmus `disco` byl odstraněn;
 jeho původní výskyty v dodaných YAML byly nahrazené `trvale_zapnuto`.
